@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>वर्कर रजिस्ट्रेशन - My Indian Workers</title>
+    <style>
+        body { font-family: sans-serif; background: #f4f4f4; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+        .form-container { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); width: 300px; }
+        h2 { color: #e67e22; margin-bottom: 20px; text-align: center; }
+        
+        /* इनपुट बॉक्स स्टाइल */
+        input { 
+            width: 100%; 
+            padding: 15px; 
+            margin: 8px 0; 
+            border: 1px solid #ccc; 
+            border-radius: 5px; 
+            box-sizing: border-box; /* इससे पैडिंग बाहर नहीं निकलती */
+        }
+
+        .submit-btn { 
+            width: 100%; 
+            padding: 12px; 
+            background: #e67e22; 
+            color: white; 
+            border: none; 
+            border-radius: 5px; 
+            font-weight: bold; 
+            cursor: pointer; 
+            font-size: 16px;
+        }
+        
+        .submit-btn:hover { background: #d35400; }
+        .back { display: block; text-align: center; margin-top: 15px; color: gray; text-decoration: none; font-size: 14px; }
+    </style>
+</head>
+<body>
+
+<div class="form-container">
+    <h2>वर्कर पंजीकरण</h2>
+    
+
+   <form id="workerForm">
+    <input type="text" id="regName" name="regName" placeholder="पूरा नाम" required>
+    <div style="display: flex; gap: 5px; margin-bottom: 10px;">
+    <select name="countryCode" style="width: 85px; padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 14px;">
+        <option value="+91">+91 (IN)</option>
+        <option value="+966">+966 (SA)</option>
+        <option value="+971">+971 (UAE)</option>
+    </select>
+
+    <input type="tel" 
+           name="regMobile" 
+           id="regMobile"
+           placeholder="मोबाइल नंबर (10 अंक)" 
+           pattern="[0-9]{10}" 
+           title="कृपया 10 अंकों का सही मोबाइल नंबर डालें" 
+           maxlength="10" 
+           oninput="this.value = this.value.replace(/[^0-9]/g, '');"
+           style="flex: 1; padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 16px; box-sizing: border-box;"
+           required>
+</div>
+<div style="width: 100%; margin-bottom: 10px;">
+    <input type="tel" 
+           name="regAadhar" 
+           id="regAadhar"
+           placeholder="आधार कार्ड नंबर (12 अंक)" 
+           pattern="[0-9]{12}" 
+           title="आधार कार्ड 12 अंकों का होना चाहिए" 
+           maxlength="12" 
+           oninput="this.value = this.value.replace(/[^0-9]/g, '');"
+           style="width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 16px; box-sizing: border-box; display: block;"
+           required>
+</div>
+
+<input type="text" name="regAddress"
+id="regAddress",
+placeholder="पूरा पता (गाँव,कसबा,मकान नंबर/गली)" required>
+    
+<input type="text" name="regCity"
+id="regCity"
+placeholder="अपना शहर लिखें (जैसे: ब्लॉक का नाम,और शहर, जिला)" required>
+
+<div class="form-group">
+    <label for="workInput" style="display: block; margin-bottom: 8px; font-weight: bold;">
+        अपना काम चुनें (Select Your Work):
+    </label>
+    
+    <select id="workInput" name="regWork" required 
+        style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #ccc; font-size: 16px;">
+        <option value="">-- यहाँ क्लिक करके चुनें --</option>
+        <option value="Plumber">प्लंबर (Plumber)</option>
+        <option value="Electrician">इलेक्ट्रीशियन (Electrician)</option>
+        <option value="Carpenter">बढ़ई (Carpenter)</option>
+        <option value="Mason">राजमिस्त्री (Mason)</option>
+        <option value="Painter">पेंटर (Painter)</option>
+        <option value="Welder">वेल्डर (Welder)</option>
+        <option value="AC Mechanic">एसी मैकेनिक (AC Mechanic)</option>
+        <option value="Tiles Mistri">टाइल्स मिस्त्री (Tiles Mistri)</option>
+        <option value="Labour">मजदूर (Labour)</option>
+        <option value="Other">अन्य (Other)</option>
+    </select>
+</div>
+
+
+
+
+  
+     <input type="hidden" name="userType" value="worker">
+
+    <button type="submit" class="submit-btn">सबमिट करें</button>
+    
+    ​"काम की तलाश छोड़िए, अब काम खुद आपके पास आएगा! 🛠️"
+​'My Indian Workers' से जुड़ें और अपनी कला की सही कीमत पाएं।
+न भाग-दौड़ की चिंता, न पैसों का झंझट—बस काम पर ध्यान दें, बाकी हम संभालेंगे।
+    
+</form>
+<div style="text-align:center; margin-top:20px;">
+  
+  
+        <h3>वर्कर अपनी हाजिरी दर्ज करें 👇</h3>
+  
+    <button onclick="window.location.href='attendance.html'" 
+            style="background:#2c3e50; color:white; padding:15px 30px; border:none; border-radius:10px; font-weight:bold; cursor:pointer; width:90%; font-size:18px;">
+      
+        
+      
+        📸 वर्कर हाजिरी (Attendance)
+    </button>
+</div>
+
+<div style="background:white; padding:20px; border-radius:15px; box-shadow:0 4px 8px rgba(0,0,0,0.1);">
+    
+</div>
+
+
+   <a href="login-choice.html" class="back">← वापस जाएँ</a>
+</div>
+    <script src="script.js"></script>
+    
+
+<script>
+    // अपना लिंक यहाँ डालें
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx7i54hKon1Dizk_ZgP6tpjNolJINeYLxPD4UdncQwMZUpUHgO4GI-NhzSC5o8IpaeZ/exec"; 
+
+    document.getElementById('workerForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const btn = e.target.querySelector('button');
+        btn.innerText = "⏳ प्रोसेसिंग...";
+        btn.disabled = true;
+
+        const formData = new FormData(this);
+        const data = {};
+        formData.forEach((value, key) => { data[key] = value; });
+
+        fetch(SCRIPT_URL, {
+            method: 'POST',
+            mode: 'no-cors',
+            body: JSON.stringify(data)
+        }).then(() => {
+            alert("सफलतापूर्वक आपका रजिस्ट्रेशन हो गया!");
+            location.reload();
+        }).catch(() => {
+            alert("कुछ गड़बड़ हुई, दोबारा प्रयास करें।");
+            btn.disabled = false;
+        });
+    });
+</script>
+
+
+</body>
+</html>
+
+: <input type="hidden" name="userType" value="worker">

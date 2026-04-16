@@ -1,0 +1,503 @@
+/* 1. पूरी वेबसाइट के लिए सेटिंग */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+html, body {
+    width: 100%;
+    overflow-x: hidden; /* साइड में खिसकना बंद होगा */
+}
+
+/* 2. नेविगेशन बार (Header) - इसे छोटा किया गया है */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: linear-gradient(135deg, #2c3e50, #34495e);
+    padding: 10px 3%;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.logo {
+    color: #f39c12;
+    font-size: 22px; /* अक्षर छोटे किए ताकि लॉगिन न कटे */
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.nav-links {
+    display: flex;
+    gap: 15px;
+}
+
+.nav-links a {
+    color: white;
+    text-decoration: none;
+    font-size: 13px; /* मोबाइल पर फिट आने के लिए */
+}
+/* मॉडर्न प्रीमियम हीरो सेक्शन */
+.hero {
+    /* नए जमाने का स्टाइलिश ग्रेडिएंट (गहरा नीला, बैंगनी और काला मिक्स) */
+    background: radial-gradient(circle at top right, #2c3e50, transparent),
+                radial-gradient(circle at bottom left, #000000, transparent),
+                linear-gradient(135deg, #1a1e26 0%, #2c3e50 100%);
+    
+    padding: 60px 5% 40px; /* मोबाइल पर अच्छी ऊंचाई */
+    text-align: center;
+    color: white;
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+/* हीरो सेक्शन - लंबाई बढ़ाई गई है ताकि बटन और टेक्स्ट साफ दिखें */
+.hero-section {
+    position: relative;
+    width: 100%;
+    
+    /* लंबाई को 50vh से बढ़ाकर 70vh कर दिया गया है */
+    min-height: 50vh; 
+    
+    background-image: url('https://i.postimg.cc/Njx4DmVm/1776339953562.png');
+    background-size: cover; 
+    background-position: center center; 
+    background-repeat: no-repeat;
+    display: flex;
+    justify-content: center;
+    align-items: center; 
+    overflow: hidden;
+    background-color: #2c3e50;
+}
+
+/* मोबाइल के लिए स्पेशल सेटिंग्स */
+@media (max-width: 600px) {
+    .hero-section {
+        /* मोबाइल पर लंबाई को 60vh किया ताकि बटन नीचे न दबे */
+        min-height: 47vh; 
+        background-size: cover;
+    }
+    
+    .hero-content h1 {
+        font-size: 24px;
+        margin-bottom: 15px;
+        line-height: 1.2;
+    }
+    
+    .hero-content p {
+        font-size: 15px;
+        margin-bottom: 20px;
+    }
+
+    /* सर्च बटन के लिए अतिरिक्त जगह */
+    .search-btn {
+        padding: 12px 25px !important;
+        font-size: 16px !important;
+    }
+}
+
+.hero-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* हल्का सा और गहरा किया ताकि टेक्स्ट चमके */
+    z-index: 1;
+}
+
+.hero-content {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    color: #ffffff;
+    padding: 20px;
+    width: 95%;
+    /* ऊपर से थोड़ी जगह छोड़ी गई है */
+    margin-top: 10px;
+}
+
+
+
+.hero-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.3); /* कालापन थोड़ा कम किया ताकि फोटो साफ दिखे */
+    z-index: 1;
+}
+
+.hero-content {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    color: #ffffff;
+    padding: 10px;
+    margin-top: 20px;
+}
+
+
+.hero-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.3); /* कालापन थोड़ा कम किया ताकि फोटो साफ दिखे */
+    z-index: 1;
+}
+
+.hero-content {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    color: #ffffff;
+    padding: 10px;
+    margin-top: 20px;
+}
+
+
+
+.hero-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.4); 
+    z-index: 1;
+}
+
+.hero-content {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    color: #ffffff;
+    padding: 15px;
+    margin-top: 30px; /* टेक्स्ट को थोड़ा ऊपर शिफ्ट किया */
+}
+
+
+
+/* स्क्रीन पर काला पर्दा (Overlay) - इसे थोड़ा हल्का कर दिया है */
+.hero-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.4); /* 40% कालापन */
+    z-index: 1;
+}
+
+/* टेक्स्ट को पर्दे के ऊपर लाने के लिए z-index और मार्जिन */
+.hero-content {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    color: #ffffff;
+    padding: 20px;
+    max-width: 90%;
+    margin-top: 50px; /* टेक्स्ट को फोटो के ऊपरी हिस्से पर रखने के लिए */
+}
+
+
+/* स्क्रीन पर गहरा काला पर्दा ताकि टेक्स्ट साफ़ दिखे */
+.hero-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* इसे कम-ज्यादा कर सकते हैं */
+    z-index: 1;
+}
+
+/* टेक्स्ट को पर्दे के ऊपर लाने के लिए z-index */
+.hero-content {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    color: #ffffff;
+    padding: 20px;
+    max-width: 90%;
+}
+
+
+/* स्क्रीन पर हल्का काला पर्दा (ताकि टेक्स्ट साफ़ दिखे) */
+.hero-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6); /* 60% कालापन, स्क्रीनशॉट जैसा */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* 2. टेक्स्ट का स्टाइल (सफ़ेद और साफ़) */
+.hero-content {
+    text-align: center;
+    color: #ffffff; /* शुद्ध सफ़ेद टेक्स्ट */
+    padding: 20px;
+    max-width: 90%;
+}
+
+.hero-content h1 {
+    font-size: 32px; /* मोबाइल के लिए बड़ा हेडिंग */
+    font-weight: bold;
+    line-height: 1.3;
+    margin-bottom: 20px;
+}
+
+.hero-content p {
+    font-size: 16px;
+    line-height: 1.6;
+    margin-bottom: 30px;
+}
+
+/* 3. सर्च बार का डिजाइन (सफ़ेद और केसरी रंग) */
+.search-bar {
+    background-color: #ffffff;
+    border-radius: 50px; /* बिल्कुल गोल किनारे */
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3); /* नीचे हल्का सा साया */
+}
+
+/* इनपुट बॉक्स */
+.search-bar input {
+    border: none;
+    outline: none;
+    padding: 10px 15px;
+    flex: 1; /* पूरी जगह लेने के लिए */
+    font-size: 14px;
+    color: #333333;
+    background: transparent;
+}
+
+/* केसरी रंग का 'खोजें' बटन */
+.search-bar button {
+    background-color: #e67e22; /* स्क्रीनशॉट जैसा केसरी रंग */
+    color: #ffffff;
+    border: none;
+    outline: none;
+    padding: 10px 25px;
+    border-radius: 50px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+.search-bar button:hover {
+    background-color: #d35400; /* दबाने पर गहरा रंग */
+}
+
+/* फूटर का नया प्रोफेशनल स्टाइल */
+footer {
+    background-color: #2c3e50; /* गहरा नीला/काला रंग (स्क्रीनशॉट जैसा) */
+    color: #ffffff; /* मुख्य टेक्स्ट का रंग सफ़ेद */
+    padding: 20px 15px;
+    text-align: center;
+    font-family: 'Arial', sans-serif;
+    border-top: 4px solid #e67e22; /* ऊपर की तरफ पतली केसरी पट्टी */
+}
+
+/* कॉपीराइट वाली लाइन */
+footer p {
+    font-size: 14px;
+    margin-bottom: 15px;
+}
+
+/* 'My Indian Workers' नाम का रंग */
+footer p span.brand-name {
+    color: #e67e22; /* केसरी रंग */
+    font-weight: bold;
+}
+
+/* 'नियम और शर्तें' और एडमिन वाला हिस्सा */
+.footer-links {
+    margin-top: 10px;
+    font-size: 13px;
+}
+
+.footer-links a {
+    color: #e67e22; /* लिंक का रंग केसरी */
+    text-decoration: none;
+    margin: 0 5px;
+}
+
+.footer-links a:hover {
+    text-decoration: underline;
+}
+
+/* एडमिन के नाम का स्टाइल */
+.admin-info {
+    margin-top: 15px;
+    color: #bdc3c7; /* हल्का ग्रे रंग */
+    font-size: 12px;
+}
+
+.admin-name {
+    color: #e67e22;
+    font-weight: bold;
+}
+/* संपर्क करें वाले डिब्बों का स्टाइल */
+.contact-card {
+    background-color: #ffffff;
+    border-radius: 15px;
+    padding: 20px;
+    margin: 15px auto; /* 'auto' लिखने से डिब्बा बीच (Center) में आ जाएगा */
+    
+    width: 85%;      /* मोबाइल स्क्रीन की 85% चौड़ाई लेगा */
+    max-width: 400px; /* बड़े फोन पर भी 400px से ज्यादा चौड़ा नहीं होगा */
+    
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    border: 1px solid #eee;
+    text-align: center;
+}
+
+.hero-content h1 {
+    word-wrap: break-word; /* लंबा शब्द होने पर अगली लाइन में आ जाएगा */
+    padding: 0 10px;
+}
+
+
+/* जब बटन लॉक हो तो ऐसा दिखेगा */
+.btn-disabled {
+    background-color: #bdc3c7 !important;
+    cursor: not-allowed !important;
+    opacity: 0.6;
+}
+
+
+/* कंडीशन टेक्स्ट को लाल करने के लिए सुधार */
+.condition-text {
+    color: #ff0000 !important; /* शुद्ध लाल रंग और सबसे ज्यादा प्राथमिकता */
+    font-weight: bold !important;
+    font-size: 15px;
+    margin: 20px 0;
+    text-align: left;
+    line-height: 1.6;
+    display: block; /* यह पक्का करेगा कि यह सही से दिखे */
+}
+
+
+.payment-btn {
+    width: 100%;
+    background: linear-gradient(45deg, #f1c40f, #f39c12);
+    color: #000;
+    border: none;
+    padding: 15px;
+    border-radius: 10px;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(243, 156, 18, 0.4);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.payment-btn:hover {
+    background: linear-gradient(45deg, #f39c12, #e67e22);
+}
+
+/* इसे CSS फ़ाइल में सबसे नीचे पेस्ट करें */
+.condition-text { 
+    background: #fff5f5; /* हल्का लाल बैकग्राउंड */
+    color: #c0392b; /* गहरा लाल टेक्स्ट */
+    padding: 12px; 
+    border-radius: 8px; 
+    font-size: 14px; 
+    margin: 15px 0; 
+    text-align: left; 
+    border: 1px solid #f5c6cb; /* लाल बॉर्डर */
+    border-left: 5px solid #e74c3c; /* बाईं ओर मोटी लाल लाइन */
+    font-weight: 500;
+}
+
+
+/* यह हिस्सा अपने आप <h2> वाले टेक्स्ट यानी "वर्कर हाजिरी" को रंगीन कर देगा */
+
+/* हमारी सेवाएं सेक्शन - नया कलर (Soft Orange/Gold) */
+main {
+    background: linear-gradient(135deg, #fff9f1 0%, #ffe0b2 100%); /* हल्का नारंगी और क्रीम शेड */
+    padding: 60px 5% !important;
+    text-align: center;
+}
+
+main h2 {
+    color: #e67e22; /* गहरा केसरी */
+    font-size: 32px;
+    margin-bottom: 15px;
+    font-weight: bold;
+}
+
+/* संपर्क करें सेक्शन - नया डार्क प्रीमियम कलर */
+#contact {
+    /* गहरा नीला-काले रंग का प्रीमियम ग्रेडिएंट */
+    background: linear-gradient(180deg, #1a2a3a 0%, #0d151f 100%) !important; 
+    color: white !important;
+    padding: 80px 5% !important;
+    border-top: 5px solid #f39c12; /* ऊपर एक पतली सुनहरी पट्टी */
+    border-top-left-radius: 40px;
+    border-top-right-radius: 40px;
+}
+
+#contact h2 {
+    color: #ffffff !important;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+    font-size: 34px !important;
+}
+
+/* संपर्क कार्ड्स का नया ग्लास-लुक कलर */
+.contact-card-new {
+    /* हल्का सा सुनहरा सफेद पारदर्शी रंग */
+    background: rgba(243, 156, 18, 0.1) !important; 
+    backdrop-filter: blur(15px);
+    padding: 30px;
+    border-radius: 20px;
+    width: 280px;
+    border: 1px solid rgba(243, 156, 18, 0.3); /* केसरी बॉर्डर */
+    transition: all 0.3s ease;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+}
+
+.contact-card-new:hover {
+    transform: translateY(-10px);
+    background: rgba(243, 156, 18, 0.2) !important;
+    border: 1px solid #f39c12;
+}
+
+.contact-card-new h4 {
+    color: #f39c12; /* केसरी टाइटल */
+    font-size: 22px;
+}
+
+.contact-card-new p {
+    color: #ffffff; /* शुद्ध सफेद टेक्स्ट */
+    font-weight: 500;
+}
+
+/* हमारी सेवाएं सेक्शन का नया लुक */
+
+
+
+

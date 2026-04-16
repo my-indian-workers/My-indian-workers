@@ -1,0 +1,236 @@
+
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>बुकिंग सफल - My Indian Workers</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background-color: #f0f2f5; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 10px; }
+        .container { background: white; width: 100%; max-width: 480px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); text-align: center; overflow: hidden; padding-bottom: 20px; }
+        .header { background: #27ae60; padding: 30px 15px; color: white; }
+        .success-icon { font-size: 50px; background: white; color: #27ae60; border-radius: 50%; width: 70px; height: 70px; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 10px; }
+        .booking-id { background: #e8f5e9; color: #2e7d32; padding: 5px 15px; border-radius: 50px; font-weight: bold; font-size: 14px; margin: 15px 0; display: inline-block; }
+        .warning-box { background: #fff4e5; border-left: 5px solid #ff9800; padding: 12px; margin: 0 20px 20px 20px; text-align: left; border-radius: 8px; font-size: 14px; }
+        .payment-card { border: 1px solid #ddd; border-radius: 12px; padding: 15px; background: #fafafa; margin: 0 20px 20px 20px; }
+        .bank-details { text-align: left; font-size: 14px; line-height: 1.8; }
+        .copy-btn { background: #f39c12; color: white; border: none; padding: 2px 8px; border-radius: 4px; font-size: 11px; cursor: pointer; margin-left: 5px; }
+        .qr-code { width: 180px; height: 180px; margin: 15px auto; border: 3px solid #ddd; padding: 5px; display: block; }
+        .upi-btn { display: block; background: #2980b9; color: white; text-align: center; padding: 15px; text-decoration: none; border-radius: 10px; font-weight: bold; font-size: 18px; margin: 20px; cursor: pointer; }
+        .wa-button { background: #25d366; color: white; border: none; padding: 15px; border-radius: 8px; display: block; font-weight: bold; font-size: 16px; margin: 10px 20px; width: calc(100% - 40px); cursor: pointer; }
+        hr { margin: 20px 0; border: 0; border-top: 1px solid #eee; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <div class="success-icon">✓</div>
+        <h2 style="color:white; margin:0;">बुकिंग स्वीकार की गई!</h2>
+    </div>
+
+    <div class="booking-id">ID: <span id="booking-id">#MIB-5797</span></div>
+
+    <div class="warning-box">
+        <strong>⚠️ महत्वपूर्ण:</strong> बुकिंग कन्फर्म करने के लिए 100  का एडवांस पेमेंट अनिवार्य है। रिफंटेबल * यह अमाउंट बाद में आपके अमाउंट में जोड़ दिया जायेगा ।।
+    </div>
+
+    <div class="payment-card">
+        <h3 style="font-size:16px; color:#d35400; margin-bottom:10px;">💳 सुरक्षित भुगतान (Bank Details)</h3>
+        <div class="bank-details">
+            <p>नाम: <b>MY INDIAN WORKERS</b></p>
+            <p>बैंक: <b>AXIS BANK</b></p>
+            <p>A/C: <b>924010045446944</b> <button class="copy-btn" onclick="copyText('924010045446944')">Copy</button></p>
+            <p>IFSC: <b>UTIB0005282</b> <button class="copy-btn" onclick="copyText('UTIB0005282')">Copy</button></p>
+        </div>
+        <p style="font-size: 12px; color: #d35400; margin-top: 10px; font-weight: bold;">
+            * UPI काम न करने पर सीधे बैंक ट्रांसफर या 9793400647 पर  GPay/Phonepe/Paytm करें ।
+        </p>
+    </div>
+
+    <a onclick="openUPI()" class="upi-btn">
+        📱 Google Pay / PhonePe / Paytm से पे करें
+    </a>
+<div style="text-align: center; margin-top: 20px; border: 1px solid #ddd; padding: 15px; border-radius: 15px; background: #fff;">
+    <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=upi://pay?pa=9793400647@paytm%26pn=My%20Indian%20Workers%26cu=INR" 
+         alt="QR Code" style="width: 180px; height: 180px; border: 2px solid #27ae60; padding: 5px;">
+    
+    <p style="font-size: 14px; color: #333; font-weight: bold; margin-top: 8px;">📸 Scan & Pay with any UPI App</p>
+    
+    <button type="button" onclick="showBigQR()" style="background-color: #f39c12; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-size: 14px; margin-top: 10px; font-weight: bold;">
+        🔍 QR कोड बड़ा करें (Full Screen)
+    </button>
+</div>
+
+<div id="qrModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:1000; justify-content:center; align-items:center; flex-direction:column; color:white;">
+    <h3 style="margin-bottom:20px;">My Indian Workers UPI QR</h3>
+    <img src="https://api.qrserver.com/v1/create-qr-code/?size=350x350&data=upi://pay?pa=9793400647@paytm%26pn=My%20Indian%20Workers%26cu=INR" 
+         style="width:300px; height:300px; border:10px solid white; border-radius:10px;">
+    <p style="margin-top:20px; font-size:18px;">स्कैन करने के बाद वापस जाएँ</p>
+    <button onclick="closeBigQR()" style="margin-top:20px; padding:10px 30px; background:#e74c3c; color:white; border:none; border-radius:5px; font-weight:bold; cursor:pointer;">❌ बंद करें (Close)</button>
+</div>
+
+
+    
+  
+
+    <hr>
+    <p style="font-size: 13px; color: #666; margin-bottom: 10px;">भुगतान के बाद स्क्रीनशॉट व्हाट्सएप पर भेजें:</p>
+
+    <button onclick="openWhatsApp()" class="wa-button">
+        WhatsApp पर स्क्रीनशॉट भेजें
+    </button>
+  <div style="text-align: center; margin-top: 20px; padding: 10px;">
+    <div style="margin-bottom: 15px; background: #fff8e1; padding: 10px; border-radius: 8px; border: 1px dashed #ff9800; display: inline-block; width: 100%; max-width: 350px;">
+        <input type="checkbox" id="payConfirm" onclick="enableReportBtn()" style="transform: scale(1.3); cursor: pointer;"> 
+        <label for="payConfirm" style="font-size: 14px; color: #333; cursor: pointer; font-weight: bold; margin-left: 8px;">
+            हाँ, मैंने पेमेंट कर दिया है।
+        </label>
+    </div>
+    
+    <p style="color: #d35400; font-weight: bold; font-size: 14px; margin-bottom: 10px;">
+        पेमेंट करने के बाद नीचे बटन पर क्लिक करके स्क्रीनशॉट भेजें 👇
+    </p>
+
+    <button id="reportBtn" onclick="handleReportClick()" 
+            style="background-color: #bdc3c7; color: white; border: none; padding: 15px 25px; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 18px; width: 100%; max-width: 350px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px; margin: 0 auto;">
+        <span id="lockStatus">🔒</span> 
+        <span id="btnText">पेमेंट रिपोर्ट लॉक है</span>
+    </button>
+</div>
+
+
+
+
+
+
+
+    <br>
+    <a href="index.html" style="color: #7f8c8d; text-decoration: none; font-size: 13px; display: block; margin-bottom: 10px;">← वापस जाएँ</a>
+</div>
+
+<script>
+    function generateBookingID() {
+        const randomNumber = Math.floor(1000 + Math.random() * 9000);
+        document.getElementById("booking-id").innerText = "#MIB-" + randomNumber;
+    }
+    window.onload = generateBookingID;
+
+    function copyText(val) {
+        const tempInput = document.createElement("input");
+        tempInput.value = val;
+        document.body.appendChild(tempInput);
+        tempInput.select();
+        document.execCommand("copy");
+        document.body.removeChild(tempInput);
+        alert("कॉपी हो गया: " + val);
+    }
+
+    // फंक्शन 1: चेकबॉक्स टिक करने पर बटन खोलने के लिए
+// यह फंक्शन चेकबॉक्स क्लिक करने पर बटन का लुक बदलेगा
+function enableReportBtn() {
+    const checkBox = document.getElementById("payConfirm");
+    const reportBtn = document.getElementById("reportBtn");
+    const lockStatus = document.getElementById("lockStatus");
+    const btnText = document.getElementById("btnText");
+    
+    if (checkBox.checked == true) {
+        // अनलॉक होने पर लुक बदलें
+        reportBtn.style.backgroundColor = "#27ae60"; // हरा रंग
+        lockStatus.innerText = "✅"; 
+        btnText.innerText = "पेमेंट रिपोर्ट करें और रसीद पाएँ";
+    } else {
+        // लॉक होने पर वापस वैसा ही करें
+        reportBtn.style.backgroundColor = "#bdc3c7"; // ग्रे रंग
+        lockStatus.innerText = "🔒"; 
+        btnText.innerText = "पेमेंट की रसीद प्राप्ति  रिपोर्ट लॉक है";
+    }
+}
+
+// --- इमेज कंप्रेसर फंक्शन ---
+    async function compressImage(file) {
+        return new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = (e) => {
+                const img = new Image();
+                img.src = e.target.result;
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    let width = 800; // 800px चौड़ाई काफी है
+                    let scaleFactor = width / img.width;
+                    canvas.width = width;
+                    canvas.height = img.height * scaleFactor;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                    resolve(canvas.toDataURL('image/jpeg', 0.6).split(',')[1]);
+                };
+            };
+        });
+    }
+
+
+// यह फंक्शन बटन दबाने पर काम करेगा
+function handleReportClick() {
+    const checkBox = document.getElementById("payConfirm");
+    
+    if (checkBox.checked == true) {
+        // अगर टिक लगा है तो रसीद वाले पेज पर भेजें
+        window.location.href = 'payment.html';
+    } else {
+        // अगर टिक नहीं लगा है तो अलर्ट दिखाएं (बटन लॉक है)
+        alert("⚠️ कृपया पहले ऊपर दिए गए बॉक्स में टिक (✅) लगाएँ कि आपने पेमेंट कर दिया है, तभी यह बटन खुलेगा।");
+    }
+}
+
+
+// फंक्शन 2: UPI बटन दबाने पर खुद ब खुद टिक लग जाए और बटन खुल जाए
+function openUPI() {
+    const upiLink = "upi://pay?pa=9793400647@paytm&pn=My%20Indian%20Workers&cu=INR";
+    window.location.href = upiLink;
+
+    // मालिक ने बटन दबाया मतलब पेमेंट करने गया, तो हम खुद ही टिक लगा देंगे
+    document.getElementById("payConfirm").checked = true;
+    enableReportBtn(); // बटन को हरा कर देगा
+
+    setTimeout(function() {
+        alert("⚠️ सूचना:\nपेमेंट पूरा होने के बाद 'पेमेंट रिपोर्ट करें' बटन पर क्लिक करके अपनी रसीद ज़रूर प्राप्त करें।");
+    }, 3000);
+}
+
+
+    
+    
+
+    function openWhatsApp() {
+        const phone = "8840393880"; 
+        const bookingId = document.getElementById("booking-id").innerText;
+        const message = encodeURIComponent("नमस्ते, मैंने ₹200 का एडवांस पेमेंट कर दिया है। मेरी बुकिंग आईडी " + bookingId + " है।");
+        const waUrl = "https://wa.me/" + phone + "?text=" + message;
+        window.location.assign(waUrl);
+    }
+    
+    
+    // पेज लोड होते ही बीच में यह मैसेज आएगा
+window.onload = function() {
+    generateBookingID(); // यह आपकी पुरानी आईडी बनाने वाली लाइन है
+    alert("🎉 बुकिंग सफल! हम आपसे जल्द संपर्क करेंगे। \n\nकृपया बुकिंग कन्फर्म करने के लिए 100 का एडवांस पेमेंट करें।  रिफंटेबल * यह अमाउंट बाद में आपके अमाउंट में जोड़ दिया जायेगा ।");
+};
+
+// बड़े QR को दिखाने के लिए
+function showBigQR() {
+    document.getElementById('qrModal').style.display = 'flex';
+}
+
+// बड़े QR को बंद करने के लिए
+function closeBigQR() {
+    document.getElementById('qrModal').style.display = 'none';
+}
+
+
+
+</script>
+
+</body>
+</html>

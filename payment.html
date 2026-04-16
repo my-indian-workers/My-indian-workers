@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>भुगतान रसीद - My Indian Workers</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f4f4f4; padding: 15px; display: flex; flex-direction: column; align-items: center; }
+        .payment-card, .receipt-card { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); width: 100%; max-width: 400px; }
+        h2 { color: #27ae60; text-align: center; margin-top: 0; }
+        input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
+        .btn-pay, .btn-print { background-color: #27ae60; color: white; border: none; padding: 15px; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 16px; margin-top: 10px; }
+        .btn-print { background-color: #2980b9; }
+        .upload-box { border: 2px dashed #27ae60; padding: 15px; text-align: center; border-radius: 10px; margin-bottom: 10px; background: #f0fff4; }
+        
+        #receiptSection { display: none; border: 2px solid #27ae60; position: relative; }
+        .receipt-logo { font-size: 20px; font-weight: bold; color: #d35400; border-bottom: 2px solid #eee; padding-bottom: 10px; margin-bottom: 15px; }
+        .receipt-row { display: flex; justify-content: space-between; margin: 10px 0; border-bottom: 1px dashed #eee; padding-bottom: 5px; }
+        .receipt-footer { text-align: center; font-size: 12px; color: #7f8c8d; margin-top: 20px; }
+        .success-mark { color: #27ae60; font-size: 50px; margin: 10px 0; }
+
+        @media print {
+            body * { visibility: hidden; }
+            #receiptSection, #receiptSection * { visibility: visible; }
+            #receiptSection { position: absolute; left: 0; top: 0; width: 100%; border: none; }
+            .btn-print, .btn-pay { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="payment-card" id="formSection">
+    <h2>💰 पेमेंट रिपोर्ट करें</h2>
+    <form id="paymentForm">
+        <input type="text" id="payMibId" placeholder="बुकिंग आईडी (जैसे: #MIB-1234)" required>
+        <input type="text" id="payName" placeholder="आपका नाम" required>
+        <input type="tel" id="payMobile" placeholder="मोबाइल नंबर" maxlength="10" required>
+        <input type="number" id="payAmount" placeholder="राशि (रुपये)" required>
+        <input type="text" id="payTxn" placeholder="Transaction ID / UTR" required>
+        <div class="upload-box">
+            <label style="display:block; margin-bottom:5px; font-size:12px; font-weight:bold;">पेमेंट का स्क्रीनशॉट चुनें (Auto-Compress)</label>
+            <input type="file" id="payScreenshot" accept="image/*" required>
+        </div>
+        <button type="submit" id="paySubmitBtn" class="btn-pay">सबमिट और रसीद पाएँ ✅</button>
+    </form>
+</div>
+
+<div class="receipt-card" id="receiptSection">
+    <div class="receipt-logo">MY INDIAN WORKERS</div>
+    <div style="text-align: center;"><span class="success-mark">✔</span></div>
+    <h3 style="text-align: center; margin-top: 0;">भुगतान रसीद</h3>
+    
+    <div class="receipt-row"><strong>दिनांक:</strong> <span id="rDate"></span></div>
+    <div class="receipt-row"><strong>बुकिंग आईडी (MIB ID):</strong> <span id="rMibId" style="font-weight:bold; color:#d35400;"></span></div>
+    <div class="receipt-row"><strong>नाम:</strong> <span id="rName"></span></div>
+    <div class="receipt-row"><strong>मोबाइल:</strong> <span id="rMobile"></span></div>
+    <div class="receipt-row"><strong>राशि:</strong> <span id="rAmount"></span></div>
+    <div class="receipt-row"><strong>ट्रांजैक्शन आईडी:</strong> <span id="rTxn"></span></div>
+    <div class="receipt-row"><strong>स्थिति:</strong> <span style="color: green; font-weight: bold;">सफल (Verified)</span></div>
+
+    <div class="receipt-footer">
+        यह एक सिस्टम जनरेटेड रसीद है।<br>
+        सपोर्ट के लिए संपर्क करें: My Indian Workers
+    </div>
+    
+    <button class="btn-print" onclick="window.print()">📥 रसीद डाउनलोड / प्रिंट करें</button>
+    <button class="btn-pay" onclick="location.reload()" style="background: #7f8c8d;">एक और पेमेंट रिपोर्ट करें</button>
+</div>
+
+<p style="margin-top: 20px; font-size: 14px;">हमारे काम से खुश हैं?</p>
+<a href="feedback.html" style="color: #f39c12; font-weight: bold; text-decoration: none; border: 1px solid #f39c12; padding: 5px 10px; border-radius: 5px;">⭐ हमें रेटिंग दें</a>
+
+
+<script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx7i54hKon1Dizk_ZgP6tpjNolJINeYLxPD4UdncQwMZUpUHgO4GI-NhzSC5o8IpaeZ/exec";
+
+    document.getElementById('paymentForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const btn = document.getElementById('paySubmitBtn');
+        
+        const pMibId = document.getElementById('payMibId').value; 
+        const pName = document.getElementById('payName').value;
+        const pMobile = document.getElementById('payMobile').value;
+        const pAmount = document.getElementById('payAmount').value;
+        const pTxn = document.getElementById('payTxn').value;
+        const file = document.getElementById('payScreenshot').files[0];
+
+        btn.innerText = "⏳ इमेज और सुरक्षित की जा रही है...";
+        btn.disabled = true;
+
+        // --- इमेज कंप्रेशन फंक्शन ---
+        const compressImage = (file) => {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = (event) => {
+                    const img = new Image();
+                    img.src = event.target.result;
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        let width = img.width;
+                        let height = img.height;
+
+                        // चौड़ाई 800px तक सीमित करें (साइज कम करने के लिए)
+                        const MAX_WIDTH = 800;
+                        if (width > MAX_WIDTH) {
+                            height = Math.round((height * MAX_WIDTH) / width);
+                            width = MAX_WIDTH;
+                        }
+
+                        canvas.width = width;
+                        canvas.height = height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, width, height);
+
+                        // क्वालिटी 0.7 (70%) ताकि फाइल बहुत छोटी हो जाए
+                        const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+                        resolve(dataUrl.split(',')[1]); // Base64 हिस्सा भेजें
+                    };
+                };
+                reader.onerror = (err) => reject(err);
+            });
+        };
+
+        try {
+            // इमेज को छोटा करें
+            const compressedBase64 = await compressImage(file);
+
+            const payload = {
+    userType: "payment",
+    mibId: pMibId,
+    regName: pName,
+    regMobile: pMobile,
+    amount: pAmount,
+    transactionId: pTxn,
+    status: "Success", // यहाँ स्टेटस जोड़ दिया गया है
+    paymentScreenshot: compressedBase64
+};
+
+
+            // गूगल स्क्रिप्ट पर डेटा भेजें
+            fetch(SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                body: JSON.stringify(payload)
+            });
+
+            // रसीद दिखाएँ
+            showReceipt(pMibId, pName, pMobile, pAmount, pTxn);
+
+        } catch (err) {
+            console.error(err);
+            alert("कुछ गड़बड़ हुई। कृपया इंटरनेट चेक करें।");
+            btn.innerText = "सबमिट और रसीद पाएँ ✅";
+            btn.disabled = false;
+        }
+    });
+
+    function showReceipt(mibId, name, mobile, amount, txn) {
+        document.getElementById('rDate').innerText = new Date().toLocaleDateString('hi-IN');
+        document.getElementById('rMibId').innerText = mibId;
+        document.getElementById('rName').innerText = name;
+        document.getElementById('rMobile').innerText = mobile;
+        document.getElementById('rAmount').innerText = "₹" + amount;
+        document.getElementById('rTxn').innerText = txn;
+
+        document.getElementById('formSection').style.display = 'none';
+        document.getElementById('receiptSection').style.display = 'block';
+        
+        alert("सफलतापूर्वक सबमिट हुआ! आपकी बुकिंग आईडी " + mibId + " के साथ रसीद जनरेट हो गई है।");
+    }
+    
+    
+
+
+</script>
+
+</body>
+</html>

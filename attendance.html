@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>वर्कर हाजिरी - My Indian Workers</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; text-align: center; padding: 20px; background: #f4f7f6; }
+        .card { background: white; padding: 30px 20px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); max-width: 400px; margin: auto; }
+        .camera-trigger {
+            background: #34495e; width: 70px; height: 70px; border-radius: 50%;
+            margin: 15px auto; display: flex; align-items: center; justify-content: center;
+            cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+        input[type="text"], input[type="tel"] { width: 90%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; font-size: 16px; }
+        button { width: 95%; padding: 15px; margin: 10px 0; border: none; border-radius: 10px; color: white; font-weight: bold; font-size: 16px; cursor: pointer; transition: 0.3s; opacity: 0.5; }
+        .btn-in { background: #27ae60; }
+        .btn-out { background: #e67e22; }
+        .ready { opacity: 1 !important; transform: scale(1.02); cursor: pointer; }
+        #preview { width: 150px; height: 150px; object-fit: cover; border-radius: 10px; display: none; margin: 15px auto; border: 3px solid #27ae60; }
+        .camera-box { border: 2px dashed #34495e; padding: 15px; border-radius: 10px; margin: 20px 0; background: #ebedef; }
+    </style>
+</head>
+<body>
+
+<div class="card" id="mainCard" style="border-top: 6px solid #d35400; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); background: white;">
+    <h2 style="background: linear-gradient(90deg, #d35400, #27ae60); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 30px; font-weight: 800; margin-bottom: 20px; text-shadow: 2px 2px 5px rgba(0,0,0,0.1);">🛠️ वर्कर हाजिरी</h2>
+    
+    <input type="text" id="workerName" placeholder="अपना नाम लिखें" required>
+    <input type="tel" id="workerMobile" placeholder="मोबाइल नंबर" maxlength="10" required>
+
+    <div class="camera-box">
+        <p id="instructionText" style="font-weight: bold; color: #34495e;">📷 कैमरा बटन दबाकर फोटो खींचें</p>
+        <div class="camera-trigger" id="camBtn" onclick="document.getElementById('onlyCamera').click()">
+            <span style="font-size: 35px;">📸</span>
+        </div>
+        <input type="file" id="onlyCamera" accept="image/*" capture="environment" style="display: none;" onchange="showPreview(this)">
+    </div>
+    
+    <img id="preview" src="" alt="Worker Photo">
+    
+    <button id="btnIn" class="btn-in" onclick="processAttendance('In')" disabled>✅ काम पर पहुँच गया (Check In)</button>
+    <button id="btnOut" class="btn-out" onclick="processAttendance('Out')" disabled>🏁 काम खत्म घर वापस (Check Out)</button>
+    
+    <br><br>
+    <a href="index.html" style="color: #777; text-decoration: none; font-size: 14px;">← वापस जाएं</a>
+</div>
+
+<script>
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwLY6DYx-pL-f5bCWMnBhlvqDYAOnDWdP59hUBNfzYvuPsIPViUm9iJKyQeqNmrS8o/exec";
+
+function showPreview(input) {
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            document.getElementById('preview').src = e.target.result;
+            document.getElementById('preview').style.display = 'block';
+            document.getElementById('btnIn').disabled = false;
+            document.getElementById('btnIn').classList.add('ready');
+            document.getElementById('btnOut').disabled = false;
+            document.getElementById('btnOut').classList.add('ready');
+            document.getElementById('instructionText').innerText = "फोटो मिल गई! अब हाजिरी लगाएँ";
+        }
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+
+// फोटो को कंप्रेस (छोटा) करने का फंक्शन
+async function compressImage(file) {
+    return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = (event) => {
+            const img = new Image();
+            img.src = event.target.result;
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                let width = img.width;
+                let height = img.height;
+
+                // मैक्सिमम चौड़ाई 600px सेट कर रहे हैं ताकि साइज कम रहे
+                const MAX_WIDTH = 600;
+                if (width > MAX_WIDTH) {
+                    height *= MAX_WIDTH / width;
+                    width = MAX_WIDTH;
+                }
+
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, width, height);
+
+                // 0.6 क्वालिटी का मतलब है फोटो KB में आ जाएगी
+                const dataUrl = canvas.toDataURL('image/jpeg', 0.6);
+                resolve(dataUrl.split(',')[1]);
+            };
+        };
+    });
+}
+
+async function processAttendance(type) {
+    const wName = document.getElementById('workerName').value;
+    const wMobile = document.getElementById('workerMobile').value;
+    const fileInput = document.getElementById('onlyCamera');
+    const btn = (type === 'In') ? document.getElementById('btnIn') : document.getElementById('btnOut');
+
+    if(!wName || !wMobile || !fileInput.files[0]) {
+        alert("नाम, मोबाइल और फोटो तीनों ज़रूरी हैं!");
+        return;
+    }
+
+    const originalText = btn.innerText;
+    btn.innerText = "⏳ हाजिरी का डाटा अपलोड हो रहा है...";
+    btn.disabled = true;
+
+    try {
+        // फोटो कंप्रेस कर रहे हैं
+        const base64Image = await compressImage(fileInput.files[0]);
+
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(async (position) => {
+                const lat = position.coords.latitude;
+                const lon = position.coords.longitude;
+                const mapLink = "https://www.google.com/maps?q=" + lat + "," + lon;
+
+                const payload = {
+                    regName: wName,
+                    regMobile: wMobile,
+                    location: mapLink,
+                    status: (type === 'In') ? "Check In" : "Check Out",
+                    image: base64Image
+                };
+
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    body: JSON.stringify(payload)
+                });
+                
+                alert("✅ फोटो के साथ हाजिरी दर्ज हो गई!");
+                location.reload(); 
+
+            }, (error) => {
+                alert("⚠️ GPS ऑन करना ज़रूरी है।");
+                btn.disabled = false;
+                btn.innerText = originalText;
+            }, { enableHighAccuracy: true });
+        }
+    } catch (err) {
+        alert("कुछ गलती हुई, कृपया दोबारा कोशिश करें।");
+        btn.disabled = false;
+        btn.innerText = originalText;
+    }
+}
+</script>
+</body>
+</html>

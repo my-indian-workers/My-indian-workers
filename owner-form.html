@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>मालिक पंजीकरण और बुकिंग - My Indian Workers</title>
+    <style>
+        body { background-color: #f4f7f6; font-family: 'Segoe UI', sans-serif; display: flex; flex-direction: column; align-items: center; min-height: 100vh; margin: 0; padding: 10px; box-sizing: border-box; }
+        .form-card { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 100%; max-width: 500px; text-align: center; margin-bottom: 20px; box-sizing: border-box; }
+        h2 { color: #d35400; margin-bottom: 15px; font-size: 24px; border-bottom: 2px solid #f39c12; display: inline-block; padding-bottom: 5px; }
+        input, select, textarea { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ccc; border-radius: 8px; font-size: 16px; box-sizing: border-box; }
+        .input-group { display: flex; gap: 8px; align-items: center; margin: 10px 0; }
+        .input-group select { width: 100px; margin: 0; flex-shrink: 0; }
+        .input-group input { margin: 0; flex: 1; }
+        .submit-btn { width: 100%; background-color: #d35400; color: white; border: none; padding: 15px; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .submit-btn:hover { background-color: #e67e22; }
+        .warning-box { background: #fff3cd; color: #856404; padding: 12px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #ffeeba; font-size: 14px; text-align: left; }
+        .upload-section { text-align: left; margin: 15px 0; border: 1px solid #ddd; padding: 15px; border-radius: 10px; background-color: #f9f9f9; }
+        .bank-card { width: 100%; max-width: 500px; padding: 20px; border: 2px solid #d35400; border-radius: 15px; background: #fffaf5; text-align: left; box-sizing: border-box; margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+
+<div class="form-card">
+    <h2>मालिक पंजीकरण</h2>
+    <div class="warning-box"><strong>⚠️ ध्यान दें:</strong> बुकिंग करने के लिए पहले पंजीकरण अनिवार्य है।</div>
+
+    <form id="ownerForm">
+        <input type="text" name="regName" id="regName" placeholder="आपका पूरा नाम" required>
+        <div class="input-group">
+            <select name="countryCode">
+                <option value="+91">+91 (IN)</option>
+                <option value="+966">+966 (SA)</option>
+            </select>
+            <input type="tel" name="regMobile" id="regMobile" placeholder="मोबाइल नंबर (10 अंक)" maxlength="10" required>
+        </div>
+        <input type="text" name="regCity" id="regCity" placeholder="अपना शहर या गाँव (जैसे: अयोध्या) जिला" required>
+        
+        <div class="upload-section">
+            <label style="font-weight: bold; display: block; margin-bottom: 10px;">आधार कार्ड अपलोड (Front Side):</label>
+            <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                <button type="button" onclick="document.getElementById('aadharFrontCam').click()" style="flex: 1; padding: 10px; background: #34495e; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 14px;">📷 कैमरा</button>
+                या
+                <button type="button" onclick="document.getElementById('aadharFrontFile').click()" style="flex: 1; padding: 10px; background: #7f8c8d; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 14px;">📁 गैलरी</button>
+            </div>
+            <input type="file" id="aadharFrontCam" accept="image/*" capture="camera" style="display: none;" onchange="updateStatus(this, 'frontStatus')">
+            <input type="file" id="aadharFrontFile" accept="image/*" style="display: none;" onchange="updateStatus(this, 'frontStatus')">
+            <small id="frontStatus" style="color: #27ae60; display: block; margin-top: -10px; font-weight: bold; margin-bottom: 15px;"></small>
+
+            <hr style="border: 0; border-top: 1px solid #ddd; margin: 20px 0;">
+
+            <label style="font-weight: bold; display: block; margin-bottom: 10px;">आधार कार्ड अपलोड (Back Side):</label>
+            <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                <button type="button" onclick="document.getElementById('aadharBackCam').click()" style="flex: 1; padding: 10px; background: #34495e; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 14px;">📷 कैमरा</button>
+                या
+                <button type="button" onclick="document.getElementById('aadharBackFile').click()" style="flex: 1; padding: 10px; background: #7f8c8d; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 14px;">📁 गैलरी</button>
+            </div>
+            <input type="file" id="aadharBackCam" accept="image/*" capture="camera" style="display: none;" onchange="updateStatus(this, 'backStatus')">
+            <input type="file" id="aadharBackFile" accept="image/*" style="display: none;" onchange="updateStatus(this, 'backStatus')">
+            <small id="backStatus" style="color: #27ae60; display: block; margin-top: -10px; font-weight: bold;"></small>
+        </div>
+
+        <button type="submit" id="ownerSubmitBtn" class="submit-btn">रजिस्टर करें</button>
+    </form>
+
+    <hr style="margin: 30px 0; border: 0; border-top: 2px dashed #d35400;">
+    <div id="bookingContainer">
+        <p style="font-size: 14px; color: #666;">रजिस्ट्रेशन के बाद बुकिंग के लिए नीचे क्लिक करें:</p>
+        <button type="button" id="mainBookingBtn" onclick="showBookingForm()" disabled 
+        style="width: 100%; padding: 15px; background: #27ae60; color: white; border: none; border-radius: 10px; font-weight: bold; font-size: 16px; cursor: pointer;">
+         🔒  + कारीगर बुक करें (Worker Booking)
+        </button>
+        <section id="booking-section" style="display: none; padding: 15px; background: #fdf2e9; border-radius: 15px; margin-top: 20px;">
+            <h3 style="color: #d35400;">कारीगर बुक करें</h3>
+            <form id="bookingForm">
+                <input type="text" name="ownerName" id="bookOwnerName" placeholder="आपका नाम" required>
+                <input type="tel" name="regMobile" id="bookMobile" placeholder="मोबाइल नंबर" maxlength="10" required>
+                <select name="serviceType" id="serviceType" required>
+                    <option value="">कौन सा काम है?</option>
+                 
+        <option value="Plumber">प्लंबर (Plumber)</option>
+        <option value="Electrician">इलेक्ट्रीशियन (Electrician)</option>
+        <option value="Carpenter">बढ़ई (Carpenter)</option>
+        <option value="Mason">राजमिस्त्री (Mason)</option>
+        <option value="Painter">पेंटर (Painter)</option>
+        <option value="Welder">वेल्डर (Welder)</option>
+        <option value="AC Mechanic">एसी मैकेनिक (AC Mechanic)</option>
+        <option value="Tiles Mistri">टाइल्स मिस्त्री (Tiles Mistri)</option>
+        <option value="Labour">मजदूर (Labour)</option>
+        <option value="Other">अन्य (Other)</option>
+                </select>
+                <textarea name="address" id="regAddress" placeholder="पूरा पता लिखें" required></textarea>
+                <button type="submit" id="bookSubmitBtn" class="submit-btn" style="background:#27ae60;">बुकिंग कन्फर्म करें ✅</button>
+            </form>
+        </section>
+    </div>
+</div>
+
+<div class="bank-card">
+    <h3 style="color:#d35400; margin-top:0; font-size:18px; text-align: center;">💳 भुगतान जानकारी</h3>
+    <p><strong>खाता धारक:</strong> MY INDIAN WORKERS</p>
+    <p><strong>बैंक:</strong> STATE BANK OF INDIA</p>
+    <p><strong>IFSC:</strong> SBIN000XXXX</p>
+    <button type="button" id="payNowBtn" class="submit-btn" onclick="window.location.href='payment-success.html'" style="background-color: #ccc; cursor: not-allowed;" disabled>💰 पेमेंट करें (Pay Now)</button>
+</div>
+
+<div style="background: #fff5f5; color: #c0392b; padding: 12px; border-radius: 8px; font-size: 14px; margin: 15px 0; text-align: left; border: 1px solid #f5c6cb; border-left: 5px solid #e74c3c; font-weight: 500;">
+    <strong>⚠️ कंडीसन:</strong> वर्कर के घर पर पहुंचने पर काम की जानकारी के बाद आधा पेमेंट My Indian Workers के खाते में डालना होगा। और काम खत्म होने के 1 दिन पहले कर्मी के पहुंचने के पहले पूरा पेमेंट करना होगा अन्यथा एक दिन पहले काम रोक दिया जाएगा। धन्यवाद।🙏
+</div>
+
+<script>
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx7i54hKon1Dizk_ZgP6tpjNolJINeYLxPD4UdncQwMZUpUHgO4GI-NhzSC5o8IpaeZ/exec";
+
+function updateStatus(input, statusId) {
+    if (input.files && input.files[0]) {
+        document.getElementById(statusId).innerText = "✅ फाइल: " + input.files[0].name;
+    }
+}
+
+function showBookingForm() {
+    document.getElementById("booking-section").style.display = "block";
+    document.getElementById("booking-section").scrollIntoView({ behavior: 'smooth' });
+}
+
+// नया Image Compressor फंक्शन (आधार कार्ड के लिए बेहतरीन क्वालिटी)
+async function compressAadhar(file) {
+    return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = (event) => {
+            const img = new Image();
+            img.src = event.target.result;
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                let width = img.width;
+                let height = img.height;
+
+                // आधार के लिए 1000px चौड़ाई काफी है (साफ भी दिखेगा और KB में भी रहेगा)
+                const MAX_WIDTH = 1000;
+                if (width > MAX_WIDTH) {
+                    height *= MAX_WIDTH / width;
+                    width = MAX_WIDTH;
+                }
+
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, width, height);
+
+                // 0.7 क्वालिटी (70%) - साइज कम और लिखावट साफ
+                const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+                resolve(dataUrl.split(',')[1]);
+            };
+        };
+    });
+}
+
+// पंजीकरण सबमिट लॉजिक
+document.getElementById('ownerForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const btn = document.getElementById('ownerSubmitBtn');
+    btn.innerText = "⏳ रजिस्ट्रेशन डाटा अपलोड हो रहा है...";
+    btn.disabled = true;
+
+    const data = {
+        userType: 'owner',
+        regName: document.getElementById('regName').value,
+        regMobile: document.getElementById('regMobile').value,
+        regCity: document.getElementById('regCity').value
+    };
+
+    const frontFile = document.getElementById('aadharFrontCam').files[0] || document.getElementById('aadharFrontFile').files[0];
+    const backFile = document.getElementById('aadharBackCam').files[0] || document.getElementById('aadharBackFile').files[0];
+
+    try {
+        if (frontFile) {
+            data.frontFileData = await compressAadhar(frontFile); // कंप्रेस यहाँ हो रहा है
+            data.frontFileName = "Front_" + data.regMobile + "_" + Date.now() + ".jpg";
+        }
+        if (backFile) {
+            data.backFileData = await compressAadhar(backFile); // कंप्रेस यहाँ हो रहा है
+            data.backFileName = "Back_" + data.regMobile + "_" + Date.now() + ".jpg";
+        }
+
+        sendData(data, "रजिस्ट्रेशन और फोटो अपलोड सफल! अब आप बुकिंग कर सकते हैं");
+    } catch (err) {
+        alert("फोटो प्रोसेस करने में दिक्कत आई");
+        btn.disabled = false;
+        btn.innerText = "रजिस्टर करें";
+    }
+});
+
+// बुकिंग और डेटा भेजने के पुराने फंक्शन पहले जैसे ही रहेंगे...
+document.getElementById('bookingForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const btn = document.getElementById('bookSubmitBtn');
+    const payBtn = document.getElementById('payNowBtn');
+    btn.innerText = "⏳ बुकिंग दर्ज हो रही है...";
+    btn.disabled = true;
+    const data = {
+        userType: 'booking',
+        regName: document.getElementById('bookOwnerName').value,
+        regMobile: document.getElementById('bookMobile').value,
+        serviceType: document.getElementById('serviceType').value,
+        regAddress: document.getElementById('regAddress').value
+    };
+    fetch(SCRIPT_URL, {
+        method: 'POST',
+        body: JSON.stringify(data)
+    })
+    .then(res => {
+        alert("✅ आपकी बुकिंग सफल हुई! अब आप नीचे दिए गए बटन से पेमेंट कर सकते हैं।");
+        payBtn.disabled = false;
+        payBtn.style.backgroundColor = "#d35400";
+        payBtn.style.cursor = "pointer";
+        btn.innerText = "बुकिंग सफल ✅";
+        payBtn.scrollIntoView({ behavior: 'smooth' });
+    })
+    .catch(err => {
+        alert("कुछ तकनीकी समस्या आई");
+        payBtn.disabled = false;
+        payBtn.style.backgroundColor = "#d35400";
+    });
+});
+
+function sendData(payload, successMsg) {
+    fetch(SCRIPT_URL, {
+        method: 'POST',
+        body: JSON.stringify(payload)
+    })
+    .then(res => res.json())
+    .then(response => {
+        alert(successMsg);
+        if (payload.userType === 'owner') {
+            document.getElementById('mainBookingBtn').disabled = false;
+            document.getElementById('mainBookingBtn').innerHTML = "✅ + कारीगर बुक करें (Worker Booking)";
+            showBookingForm();
+            document.getElementById('ownerSubmitBtn').innerText = "रजिस्टर हो गया ✅";
+        }
+    })
+    .catch(err => {
+        if (payload.userType === 'owner') {
+            document.getElementById('mainBookingBtn').disabled = false;
+            showBookingForm();
+        }
+    });
+}
+</script>
+</body>
+</html>

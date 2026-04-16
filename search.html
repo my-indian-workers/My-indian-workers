@@ -1,0 +1,1174 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>एडवांस सर्च - My Indian Workers</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #f4f4f4; padding: 15px; }
+        .search-box { 
+            background: white; padding: 25px; border-radius: 15px; 
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1); max-width: 500px; margin: 20px auto; 
+        }
+        h2 { text-align: center; color: #f39c12; margin-top: 0; }
+        label { font-weight: bold; color: #444; display: block; margin-top: 15px; }
+        select { 
+            width: 100%; padding: 12px; border: 1px solid #ddd; 
+            border-radius: 10px; font-size: 16px; margin-top: 5px; box-sizing: border-box;
+        }
+        button { 
+            width: 100%; padding: 15px; background: #f39c12; color: white; 
+            border: none; border-radius: 10px; font-weight: bold; font-size: 18px; 
+            cursor: pointer; margin-top: 25px; transition: 0.3s;
+        }
+        button:hover { background: #d35400; }
+        #results { max-width: 500px; margin: 20px auto; }
+        .worker-card { 
+            background: white; padding: 20px; border-radius: 10px; 
+            margin-bottom: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-left: 6px solid #f39c12; text-align: left;
+        }
+        .worker-card h3 { margin: 0 0 10px 0; color: #333; }
+        .worker-card p { margin: 5px 0; color: #666; }
+        .call-btn {
+            display: block; background: #27ae60; color: white; text-align: center;
+            padding: 12px; border-radius: 8px; text-decoration: none;
+            font-weight: bold; margin-top: 15px;
+        }
+        .back-link { margin-top: 20px; display: block; text-decoration: none; color: #f39c12; font-weight: bold; text-align: center; }
+    </style>
+</head>
+<body>
+
+<div class="search-box">
+    <h2>🛠️ सटीक कारीगर खोजें</h2>
+    
+    <label>1. राज्य चुनें:</label>
+    <select id="stateInput" onchange="updateDistricts()">
+        <option value="">-- राज्य चुनें --</option>
+        <option value="UP">उत्तर प्रदेश (Uttar Pradesh)</option>
+        <option value="Bihar">बिहार (Bihar)</option>
+         <option value="Gujarat">गुजरात (Gujarat)</option>
+    <option value="Madhya Pradesh">मध्य प्रदश (Madhya Pradesh)</option>
+    <option value="Rajasthan">राजस्थान (Rajasthan)</option>
+    <option value="Karnataka">कर्नाटक (Karnataka)</option>
+     <option value="Kerala">केरला (Kerala)</option>
+    </select>
+
+    <label>2. जिला चुनें:</label>
+    <select id="districtInput" onchange="updateCities()">
+        <option value="">-- पहले राज्य चुनें --</option>
+    </select>
+
+    <label>3. अपना शहर चुनें:</label>
+    <select id="cityInput">
+        <option value="">-- पहले जिला चुनें --</option>
+    </select>
+
+    <label>4. क्या काम है?</label>
+    <select id="workInput">
+        <option value="">-- काम चुनें --</option>
+        <option value="Plumber">प्लंबर (Plumber)</option>
+        <option value="Electrician">इलेक्ट्रीशियन</option>
+        <option value="Carpenter">बढ़ई (Carpenter)</option>
+        <option value="Mason">राजमिस्त्री (Mason)</option>
+        <option value="Painter">पेंटर (Painter)</option>
+        <option value="Welder">वेल्डर (Welder)</option>
+        <option value="AC Mechanic">एसी मैकेनिक</option>
+        <option value="Tiles Mistri">टाइल्स मिस्त्री</option>
+        <option value="Labour">मजदूर (Labour)</option>
+        
+          <option value="Others">
+          अन्य(Others)</option>
+    </select>
+
+    <button id="searchBtn" onclick="searchWorkers()">🔍 कारीगर खोजें</button>
+    
+    <a href="index.html" class="back-link">⬅ मुख्य पेज पर वापस जाएं</a>
+</div>
+
+<div id="results"></div>
+
+<script>
+    // आपका शहर और राज्य वाला डेटा (वही पुराना डेटा यहाँ रहेगा)
+    const fullData = {
+        "UP": {
+            "Ayodhya": [
+    "Ayodhya City",
+    "Faizabad",
+    "Ayodhya Cantt",
+    "Devkali",
+    "Naka",
+    "Sahadatganj",
+    "Goshainganj",
+    "Amaniganj",
+    "Bikapur",
+    "Haringtonganj",
+    "Tarun",
+    "Masodha",
+    "Maya Bazar",
+    "Milkipur",
+    "Pura Bazar",
+    "Rudauli",
+    "Sohawal",
+    "Mawai",
+    "Ayodhya Sadar",
+    "Bharat Kund",
+    "Khandasa",
+    "Kumarganj",
+    "Haiderganj"
+],
+
+
+"Barabanki": [
+    "Barabanki City",
+    "Dewa Sharif",
+    "Banki",
+    "Fatehpur",
+    "Haidergarh",
+    "Ramnagar",
+    "Zaidpur",
+    "Dariyabad",
+    "Satrikh",
+    "Kursi",
+    "Masauli",
+    "Nindura",
+    "Sirauli Ghauspur",
+    "Puredalai",
+    "Bani Kodar",
+    "Siddhaur",
+    "Trivediganj",
+    "Suratganj",
+    "Safdarjang"
+],
+"Lucknow": [
+    "Lucknow City",
+    "Alambagh",
+    "Gomti Nagar",
+    "Hazratganj",
+    "Charbagh",
+    "Indira Nagar",
+    "Aminabad",
+    "Jankipuram",
+    "Ashiyana",
+    "Telibagh",
+    "Chinhat",
+    "Bakshi Ka Talab",
+    "Kakori",
+    "Malihabad",
+    "Mohanlalganj",
+    "Gosainganj",
+    "Sarojini Nagar",
+    "Dubagga",
+    "Itaunja"
+],
+
+"Gonda": [
+    "Gonda City",
+    "Nawabganj",
+    "Mankapur",
+    "Colonelganj",
+    "Katra Bazar",
+    "Tarabganj",
+    "Itia Thok",
+    "Paraspur",
+    "Wazirganj",
+    "Jhanjhari",
+    "Haldharmau",
+    "Belsar",
+    "Mujehana",
+    "Pandri Kripal",
+    "Rehera Bazaar",
+    "Civil Lines",
+    "Utraula Road"
+],
+
+"Basti": [
+    "Basti City",
+    "Gandhi Nagar",
+    "Harraiya",
+    "Rudrauli",
+    "Bhanpur",
+    "Kaptanganj",
+    "Bankati",
+    "Saunghat",
+    "Bahadurpur",
+    "Dubaulila",
+    "Kudraha",
+    "Paras Rampur",
+    "Ramnagar",
+    "Saltaua Gopal Pur",
+    "Vikram Jot",
+    "Ganeshpur",
+    "Malviya Road",
+    "Katra Bazar",
+    "Munderwa",
+    "Walterganj"
+],
+"Gorakhpur": [
+    "Gorakhpur City",
+    "Sahjanwa (GIDA)",
+    "Mohaddipur",
+    "Medical College",
+    "Golgadda",
+    "Pipraich",
+    "Chauri Chaura",
+    "Campierganj",
+    "Bansgaon",
+    "Khajni",
+    "Gola",
+    "Barhalganj",
+    "Sardar Nagar",
+    "Brahmpur",
+    "Kauriram",
+    "Belghat",
+    "Pali",
+    "Jungle Kauria",
+    "Chargawan",
+    "Bhathat"
+],
+"Balrampur": [
+    "Balrampur City",
+    "Tulsipur",
+    "Utraula",
+    "Pachperwa",
+    "Jarwa",
+    "Gaisari",
+    "Harriya Satgharwa",
+    "Balrampur Sadar",
+    "Shriduttganj",
+    "Rehera Bazaar",
+    "Gaindas Buzurg",
+    "Lalia",
+    "Maharajganj Terai",
+    "Malaun",
+    "Bhagwanpur",
+    "Civil Lines",
+    "Pahalwara",
+    "Hathi Khana",
+    "Purab Tola",
+    "Kuwano"
+],
+
+"Siddharthnagar": [
+    "Siddharthnagar City",
+    "Naugarh",
+    "Bansi",
+    "Itwa",
+    "Domariaganj",
+    "Shohratgarh",
+    "Barhni",
+    "Birdpur",
+    "Uska Bazar",
+    "Jogia",
+    "Lontan",
+    "Khesraha",
+    "Mithwal",
+    "Bhanpur",
+    "Khunwa",
+    "Golhaura",
+    "Tetari Bazar",
+    "Aligada",
+    "Civic Line",
+    "Phulwariya"
+],
+
+"Shravasti": [
+    "Bhelsar",
+    "Binaika",
+    "Bhinga",
+    "Ikauna",
+    "Shravasti City",
+    "Gilaula",
+    "Hariharpur Rani",
+    "Jamunaha",
+    "Sirsiya",
+    "Katra Shravasti",
+    "Laxmanpur",
+    "Nasirganj",
+    "Sonwa",
+    "Patna",
+    "Durgapur",
+    "Khurute",
+    "Charda",
+    "Malhipur",
+    "Ratanpur",
+    "Kalyanpur"
+],
+"Sultanpur": [
+    "Sultanpur City", "Amhat", "Civil Lines", "Kadipur", "Lambhua", 
+    "Musafirkhana", "Kurebhar", "Dostpur", "Akhand Nagar", "Baldirai", 
+    "Bhadaiya", "Dhanpatganj", "Dubepur", "Jaisinghpur", "Karaundi Kala", 
+    "Kurwar", "Motigarpur", "P P Kamaicha", "Haliapur", "Koeripur", 
+    "Katka Khanpur", "Semri", "Pali", "Golaghat", "Vivekanand Nagar", 
+    "Tatiri", "Shastri Nagar", "Shukul Bazar", "Paryat"
+],
+
+"Pratapgarh": [
+    "Pratapgarh City", "Bela Pratapgarh", "Kunda", "Patti", "Raniganj", 
+    "Lalganj Ajhara", "Chilbila", "Jethwara", "Antu", "Kohandaur", 
+    "Manikpur", "Katra Medniganj", "Babaganj", "Belaghat", "Bihar", 
+    "Gaura", "Kalakankar", "Laxmanpur", "Mandhata", "Pratapgarh Sadar", 
+    "Rampur Sangramgarh", "Sandwa Chandrika", "Sangipur", "Shivgarh", 
+    "Dhingwas", "Civil Lines"
+],
+"Raebareli": [
+    "Raebareli City", "Lalganj", "Unchahar", "Bachhrawan", "Saloan", 
+    "Maharajganj", "Dalmau", "Harchandpur", "Indira Nagar", "Civil Lines", 
+    "Modern Rail Coach Factory", "Munshiganj", "Tripula", "Amawan", 
+    "Chhatoh", "Deenshah Gaura", "Dih", "Khiro", "Rohaniya", "Sareni", 
+    "Satoan", "Singhpur", "Tiloi", "Gurubaksh Ganj", "ITP Area"
+],
+"Prayagraj": [
+    "Civil Lines", "Allahabad Chowk", "Katra", "Naini", "Jhalwa", 
+    "Phaphamau", "Jhusi", "Phulpur", "Handia", "Meja", "Soraon", 
+    "Karchana", "Jasra", "Shankargarh", "Lalgopalganj", "Mauaima", 
+    "Allahapur", "Teliyarganj", "Saidabad", "Chaka", "Kaurihar", 
+    "Holagarh", "Dhanupur", "Manda", "Urwa", "Koraon", "Pratappur", 
+    "Baharia", "Sringverpur", "Bamrauli"
+],
+"Ambedkar_Nagar": [
+    "Akbarpur", "Shahzadpur", "Tanda", "Jalalpur", "Malipur", 
+    "Iltifatganj", "Baskhari", "Hanswar", "Kichhauchha Sharif", 
+    "Bhiti", "Katehari", "Bhiyaon", "Jahangir Ganj", "Ramnagar", 
+    "Paipura", "Mahrua", "Ahirauli", "Sammanpur", "Jaitpur", 
+    "Mijhaura", "Ariyat", "Kurki Bazar", "Nagpur", "Ashrafpur"
+],
+"Amethi": [
+    "Gauriganj", "Amethi City", "Jagdishpur", "Musafirkhana", "Tiloi", 
+    "Jais", "Munshiganj", "Jagdishpur Industrial Area", "Korwa", "Inhauna", 
+    "Bhadar", "Bhetua", "Sangrampur", "Shahgarh", "Jamamo", "Singhpur", 
+    "Shukul Bazar", "Bazar Shukul", "Warisan Ganj", "Nihalgarh", 
+    "Haliapur", "Mohanganj", "Semrauta", "Ramganj", "Piparpur", 
+    "Sinoji", "BHEL Area", "Indus Industrial Estate", "Amethi Sadar"
+],
+
+"Hardoi": [
+    "Hardoi City", "Sandila", "Shahabad", "Sandi", "Bilgram", "Mallawan", 
+    "Pihani", "Madhoganj", "Kachhauna", "Railway Ganj", "Civil Lines", 
+    "Ahirori", "Bawan", "Behandar", "Bharawan", "Bharkhani", "Harpalpur", 
+    "Kothwan", "Pali", "Persa", "Sursa", "Tadiyawan", "Todarpur", 
+    "Beniganj", "Cinema Road", "Behta Gokul", "Sandila Industrial Area"
+],
+"Lakhimpur_Kheri": [
+    "Lakhimpur City", "Gola Gokarannath", "Mohammadi", "Palia Kalan", 
+    "Nighasan", "Dhaurahra", "Mitauli", "Kheri Town", "Sampurna Nagar", 
+    "Mailani", "Tikunia", "Bhira", "Behjam", "Bankeyganj", "Isanagar", 
+    "Kumbhi", "Nakaha", "Pasgawan", "Phoolbehar", "Ramia Behar", 
+    "Sankata Devi", "Srinagar", "Belrayan", "Bijua", "Bijnori", 
+    "Civil Lines", "Main Market", "Dudhwa Area", "Oel", "Kasta", 
+    "Rampur Mathura", "Maitani", "Mihitapur", "Sakauntha"
+],
+
+"Sitapur": [
+    "Sitapur City", "Laharpur", "Biswan", "Mahmudabad", "Misrikh", 
+    "Sidhauli", "Khairabad", "Hargaon", "Maholi", "Reusa", 
+    "Tambaur", "Ailiya", "Behta", "Gondlamau", "Kasmanda", 
+    "Paintepur", "Pahala", "Parsendi", "Pisawan", "Sakran", 
+    "Lalbagh", "Civil Lines", "Transport Nagar", "Vaidehi Nagar", 
+    "Jitendra Nagar", "Ramkot", "Machhrehta", "Pisawan Block", 
+    "Hargam Sugar Mill Area", "Thangaon", "Seota"
+],
+"Unnao": [
+    "Unnao City", "Bangarmau", "Safipur", "Hasanganj", "Purwa", 
+    "Bighapur", "Shuklaganj", "Dahi Chowki Industrial Area", "Magarwara", 
+    "Nawabগঞ্জ", "Auras", "Ganj Moradabad", "Fatehpur Chaurasi", 
+    "Asoha", "Bichhiya", "Miyanganj", "Sumerpur", "Sikandarpur Karan", 
+    "Sikandarpur Sarosi", "Sarosi", "Achalganj", "Bihar", "Maurawan", 
+    "Bhagwant Nagar", "Hilauli", "Civil Lines", "Awas Vikas", "Pariyar"
+],
+
+"Fatehpur": [
+    "Fatehpur City", "Bindki", "Khaga", "Husainganj", "Malwan", 
+    "Binaki", "Asothar", "Amouli", "Bahua", "Bhitaura", "Deomai", 
+    "Dhata", "Haswa", "Teliyani", "Vijayipur", "Khajuha", "Hathgam", 
+    "Arayan", "Kishanpur", "Ghazipur Fatehpur", "Abu Nagar", "Chowk", 
+    "Jwalaganj", "Civil Lines", "Shanti Nagar", "Radhanagar", 
+    "Transport Nagar", "Thariaon", "Kora Jahanabad", "Bakewar", 
+    "Lalauli", "Jahanabad", "Sultanpur Ghosh", "Kalyanpur"
+],
+"Kaushambi": [
+    "Manjhanpur", "Bharwari", "Sirathu", "Chail", "Sarai Akil", 
+    "Karari", "Ajhuwa", "Muratganj", "Nevada", "Saraswan", 
+    "Kara", "Paschim Sarira", "Kaushambi Block", "Mahewa Ghat", 
+    "Mooratganj", "Syed Sarawan", "Kanwar", "Tewa", "Dhamanpur", 
+    "Ushra", "Saini", "Daranagar", "Kishunpur Ambari", "Osa", 
+    "Sarsawan Block", "Bidanpur", "Purkhas", "Kadirganj"
+],
+"Deoria": [
+    "Deoria City", "Barhaj", "Salempur", "Rudrapur", "Bhatpar Rani", 
+    "Gauri Bazar", "Bhatni", "Lar", "Bankata", "Baitalpur", 
+    "Bhaluani", "Desahi Deoria", "Pathardewa", "Rampur Karkhana", 
+    "Tarkulwa", "Bhagalpur", "Raghav Nagar", "New Colony", "Civil Lines", 
+    "Malviya Road", "Subhash Chowk", "Hanuman Mandir Road", "Kunda", 
+    "Majhauwa", "Sona Ghat", "Bishunpur", "Sarya", "Pipraich Road", 
+    "Lar Road", "Khampar", "Mehra", "Mahuawa", "Bhatnipar", "Salempur Road",
+    "Gauri Bazar Town", "Madanpur", "Mahen", "Panika", "Ahirauli"
+],
+"Kushinagar": [
+    "Padrauna", "Kushinagar Town", "Kasia", "Hata", "Tamkuhi Raj", 
+    "Khadda", "Seorahi", "Ramkola", "Kaptanganj", "Fazilnagar", 
+    "Dudahi", "Sukrauli", "Vishunpura", "Nebua Naurangiya", "Motichak", 
+    "Tarya Sujan", "Bauriya", "Chhitauni", "Maitri Project Area", 
+    "Airport Road", "Bahuara", "Pipraich Road", "Sakhwatia", 
+    "Laxmiganj", "Bodwar", "Gauri Bazar Road", "Jungle Chauraha", 
+    "Turkpatti", "Ahirauli Bazar", "Belwa", "Mathia", "Kauria", 
+    "Bagha Chauraha", "Mansurganj", "Panchpedwa", "Rai Bari"
+],
+
+"Maharajganj": [
+    "Maharajganj City", "Sonauli", "Nautanwa", "Nichlaul", "Anand Nagar", 
+    "Siswa Bazar", "Pharenda", "Ghughuli", "Paniyara", "Partawal", 
+    "Thuthibari", "Brijmanganj", "Laxmipur", "Mithaura", "Ratanpur", 
+    "Dhani", "Kolhui", "Peppeganj Road", "Jungle Kauria Road", "Siswa Town", 
+    "Pali Chauraha", "Kothibhar", "Sadaat", "Belwa", "Bhairahawa Road", 
+    "Sinduria", "Shyamdeurawa", "Ganeshpur", "Chauk", "Adda Bazar", 
+    "Bhaluhee", "Bardiha", "Sohagi Barwa Area", "Gadha", "Puranpur"
+],
+
+"Sant_Kabir_Nagar": [
+    "Khalilabad", "Maghar", "Mehdawal", "Dhanghata", "Bakhira", 
+    "Semariyawan", "Haisar Bazar", "Nath Nagar", "Pauli", "Santha", 
+    "Belhar Kala", "Baghauli", "Loharsan", "Ledwa Mahua", "Mukhlishpur", 
+    "Dharmasinghwa", "Tamshwar Nath", "Kudaraha", "Usra Shahid", 
+    "Main Market Khalilabad", "Railway Station Road", "Industrial Area", 
+    "Bunkar Colony", "Gorakhpur Road", "Basti Road", "Tanda Badli", 
+    "Beladganj", "Kaseru", "Bankati", "Soni", "Jasai Pur", "Chureb", 
+    "Munderwa Road", "Hariharpur"
+],
+
+"Bahraich": [
+    "Bahraich City", "Nanpara", "Rupaidiha", "Kaisarganj", "Jarwal Road", 
+    "Payagpur", "Mahasi", "Mihinpurwa", "Risia", "Fakharpur", 
+    "Huzoorpur", "Jarwal", "Shivpur", "Tajwapur", "Visheshwarganj", 
+    "Nawabganj Bahraich", "Balha", "Chittaura", "Ikauna Road", "Gola Ganj", 
+    "Civil Lines", "Dargah Sharif Area", "Digiha", "Peepal Tiraha", 
+    "Ghantaghar", "Chayalpurwa", "Salarganj", "Qazi Pura", "Badi Haat", 
+    "Katarniaghat Area", "Motipur", "Sujauli", "Murtia", "Babaganj", 
+    "Jamunaha", "Malhipur", "Dharma Pur", "Imliya", "Bagaha"
+],
+"Shravasti": [
+    "Bhinga City",
+    "Ikauna",
+    "Shravasti Town",
+    "Gilola",
+    "Sirsiya",
+    "Jamunaha",
+    "Katra Shravasti",
+    "Laxmanpur",
+    "Malhipur",
+    "Hariharpur Rani",
+    "Sonwa",
+    "Nasirganj",
+    "Charda",
+    "Baluha",
+    "Patna Khargon",
+    "Durgapur",
+    "Pali Chauraha",
+    "Khaire dharmanpur",
+    "Manoharapur",
+    "Bhagwanpur",
+    "Semra Ghantaghar",
+    "Gautam Buddha Marg",
+    "Jetavana Area",
+    "Payagpur Road",
+    "Bahraich Road",
+    "Balrampur Border Area",
+    "Kandhabhari",
+    "Ratanpur",
+    "Pakarigariya",
+    "Lokanpur"
+],
+"Varanasi": [
+    "Varanasi City", "Godowlia", "Dashashwamedh", "Lanka", "Assi", 
+    "Sigra", "Lahurabir", "Cantt", "Ramnagar", "DLW (BLW)", 
+    "Sarnath", "Shivpur", "Pandeypur", "Chowk", "Dal mandi", 
+    "Lohta", "Chandpur Industrial Estate", "Babatpur (Airport Area)", 
+    "Cholapur", "Harhua", "Pindra", "Sewapuri", "Arajiline", 
+    "Chiraigaon", "Baragaon", "Kashi Vidyapeeth", "Phulpur", 
+    "Raja Talab", "Mughalsarai Road", "Ashapur", "Susuwahi", 
+    "Maheshpur", "Bhelupur", "Madauadih", "Jaitpura", "Adampura", 
+    "Varanasi City Station Area", "Orderly Bazar", "Teliabag", 
+    "Nadesar", "Chaitganj", "Kamachha", "Durgakund", "Sankat Mochan Area", 
+    "Ghats Area", "Sarai Mohana", "Kapsethi", "Sindhaura", 
+    "Hathi Bazar", "Mirzamurad", "Kachhwa Road", "Jansa", 
+    "Chaubeypur", "Kathiraon", "Phulwaria"
+],
+"Chandauli": [
+    "Pt. Deen Dayal Upadhyaya Nagar", "Mughalsarai", "Chandauli City", 
+    "Chakia", "Sakaldiha", "Sayyid Raja", "Chahaniya", "Dhanapur", 
+    "Niyamatabad", "Naugarh", "Shahabganj", "Barhani", "Baburi", 
+    "Padao", "Ramnagar Road", "Alinagar", "Khurja", "Daudpur", 
+    "Mahiuddinpur", "Matena", "Tanda", "Kandwa", "Dheena", 
+    "Kamalpur", "Amra", "Iliya", "Shikarganj", "Majhwar", 
+    "Kuchman", "Ganjkhwaja", "Saidupur", "Bhainsoda", "Pansari", 
+    "Railway Colony Mughalsarai", "GT Road Chandauli", "Industrial Estate Phase 1", 
+    "Mughalsarai Cantt", "Parao Chauraha", "Jalilpur", "Balanagar"
+],
+
+"Ghazipur": [
+    "Ghazipur City", "Saidpur", "Zamania", "Mohammadabad", "Dildarnagar", 
+    "Jangipur", "Nandganj", "Jakhania", "Sadat", "Kasimabad", 
+    "Bahadurganj", "Revatipur", "Bhadaura", "Bhanwarkol", "Mardah", 
+    "Birno", "Manihari", "Devkali", "Karanda", "Barachawar", 
+    "Mishra Bazar", "Mahuabagh", "Lanka Ghazipur", "Rauza", "Gora Bazar", 
+    "Vikas Bhawan Area", "City Station Road", "Ghats of Ghazipur", "Aunrihar", 
+    "Dullahpur", "Gahmar", "Bara", "Reotipur Town", "Shadiabad", 
+    "Haisar", "Nonhara", "Yusufpur", "Kundesar", "Pithapur", 
+    "Sauram", "Karimuddinpur", "Dewa", "Chauri", "Gauspur"
+],
+
+"Jaunpur": [
+    "Jaunpur City", "Shahganj", "Machhlishahr", "Mariyahu", "Kerakat", 
+    "Badlapur", "Mungra Badshahpur", "Zafarabad", "Olandganj", "Line Bazar", 
+    "Siddiqpur", "Jalalpur", "Sikrara", "Baksha", "Khutahan", "Barsathi", 
+    "Dharmapur", "Dobhi", "Karanjakala", "Muftiganj", "Maharajganj Jaunpur", 
+    "Rampur Jaunpur", "Suithakala", "Sujanganj", "Sondhi", "Shahganj Town", 
+    "Trilochan Mahadev", "Khetasarai", "Maniyari", "Newari", "Pali Jaunpur", 
+    "Sarpataha", "Gaura Badshahpur", "Chandwak", "Singramau", "Khuthan", 
+    "Saraimohana", "Jesiiz Crossing", "Shahi Bridge Area", "Wajidpur", 
+    "Sheetla Choukiya Area", "Sipah", "Rizwikhan", "Urdu Bazar"
+],
+
+"Kanpur_Nagar": [
+    "Kanpur City", "Panki", "Dada Nagar", "Fazalganj", "Jajmau", 
+    "Kalyanpur", "Kidwai Nagar", "Govind Nagar", "Rawatpur", "Rooma", 
+    "Bilhaur", "Ghatampur", "Sarsaul", "Bidhnu", "Chaubepur", 
+    "Shivrajpur", "Patara", "Civil Lines", "Swaroop Nagar", "Azad Nagar", 
+    "Vikas Nagar", "Gumti No. 5", "Ashok Nagar", "Lajpat Nagar", 
+    "Shastri Nagar", "Barra", "Naubasta", "Yashoda Nagar", "Hanspuram", 
+    "Chunniganj", "Parade", "Naveen Market", "Birhana Road", "Mall Road", 
+    "Anwarganj", "Juhi", "Saket Nagar", "Kakadeo", "Armapur Estate", 
+    "Chakeri", "Ahirwan", "Shyam Nagar", "Tatmil", "Cooperganj", 
+    "Darshan Purwa", "Harjinder Nagar", "Lal Bangla", "Shuklaganj Border", 
+    "Bithoor", "Mandhana", "Naramau", "Indira Nagar", "General Ganj", 
+    "Halsey Road", "Becon Ganj", "Moolganj", "Nayaganj"
+],
+
+"Kanpur_Dehat": [
+    "Akbarpur", "Mati", "Rania Industrial Area", "Jainpur", "Pukhrayan", 
+    "Rasulabad", "Sikandra", "Jhinjhak", "Derapur", "Amraudha", 
+    "Maitha", "Malasa", "Sandalpur", "Sarvankhera", "Jahangeerabad", 
+    "Rura", "Shiwarajpur Road", "Bhimsen", "Kaurua", "Gajner", 
+    "Musa Nagar", "Rajpur", "Satti", "Behta", "Nabipur", 
+    "Baripal", "Chaubepur Road", "Kalyanpur Border Area", "Rania Town", 
+    "Jainpur Industrial Estate", "Mangalpur", "Ambiapur", "Bhal", 
+    "Kanchausi", "Kumbhi", "Tilaunchi", "Umran", "Paraunkh", 
+    "Naukati", "Khanpur", "Damanpur", "Patiyari"
+],
+
+"Auraiya": [
+    "Auraiya City", "Dibiyapur", "Bidhuna", "Ajitmal", "Phaphund", 
+    "Achhalda", "Babarpur", "Aitawal", "Erwa Katra", "Sahar", 
+    "Bhagyanagar", "Kudarkot", "Ruruganj", "Umrain", "Kanchausi", 
+    "Pata (GAIL Area)", "NTPC Colony", "Janpad Road", "Subhash Chowk", 
+    "Tiraha Auraiya", "Devikali Temple Area", "Hariyapur", "Jaitpur", 
+    "Bela", "Sahayal", "Phaphund Station Road", "Yakubpur", 
+    "Muradganj", "Ayana", "Dalelnagar", "Kishunpur", "Khanpur", 
+    "Bhasun", "Bidhuna Road", "Kunda", "Bilhaur Road Area"
+],
+
+"Etawah": [
+    "Etawah City", "Bharthana", "Jaswantnagar", "Saifai", "Bakewar", 
+    "Ekdil", "Basrehar", "Mahewa", "Chakarnagar", "Takha", 
+    "Lakhna", "Udi", "Pashu Bazar Area", "Shastri Nagar", "Civil Lines", 
+    "Naurangabad", "Pakka Bagh", "Balram Singh Chauraha", "Railway Station Road", 
+    "Ghatia Azmat Ali", "Katra Sewa Kali", "Friend's Colony", "Tika Ganj", 
+    "Ramganj", "Kachahri Road", "Saifai Medical College Area", "Heonra", 
+    "Bhalokhar", "Kudarkot Road", "Sarsai Nawar", "Samthar", "Nagla Bari", 
+    "Usrahar", "Bidhuna Road Area", "Kishni Road", "Agra Road", 
+    "Kanpur Road", "Barhpura", "Munj", "Sarsai Helu"
+],
+"Farrukhabad": [
+    "Farrukhabad City", "Fatehgarh", "Kaimganj", "Kamalganj", "Shamsabad", 
+    "Mohammadabad", "Amritpur", "Rajepur", "Nawabganj Farrukhabad", 
+    "Kadri Gate", "Nehru Road", "Lohai Road", "Chowk Farrukhabad", 
+    "Railway Road", "Bholepur", "Awas Vikas Colony", "Civil Lines", 
+    "Cantt Area", "Yaqutganj", "Paliyanagar", "Kampil", "Rudain", 
+    "Sankisa (Buddhist Site)", "Khimseypur", "Manjhana", "Sora", 
+    "Jahanaganj", "Pali", "Kharkhadda", "Nandlalpur", "Barhpur", 
+    "Ghatia Ghat", "Station Road", "Itmadpur", "Bura Gaon", 
+    "Sani Ghat", "Bibiganj", "Husainpur", "Ganga Darwaza"
+],
+
+"Kannauj": [
+    "Kannauj City", "Sarai Meera", "Chhibramau", "Tirwa", "Gursahaiganj", 
+    "Saurikh", "Talgram", "Jalalabad", "Gugrapur", "Haseran", 
+    "Indergarh", "Makarand Nagar", "Bada Bazar", "Holi Mohalla", 
+    "Kazi Tola", "Sheikhpura", "Yusufpur", "Vinaypur", "Vishungarh", 
+    "Sikanderpur", "Kasawa", "Behta", "Gadanpur", "Miyanganj", 
+    "Naurangabad", "Medical College Area", "Palsia", "Kundarkhi", 
+    "Samdhan", "Thatia", "Umarda", "Araul Border", "Nandlalpur", 
+    "Rampur", "Bilgram Road Area", "Station Road", "Itra Market"
+],
+
+"Meerut": [
+    "Meerut City", "Begum Bagh", "Begumpul", "Abu Lane", "Shastri Nagar", 
+    "Partapur Industrial Area", "Modipuram", "Mawana", "Sardhana", "Hastinapur", 
+    "Kharkhoda", "Daurala", "Parikshitgarh", "Sadar Bazar", "Kanker Khera", 
+    "Pallavpuram", "Lohia Nagar", "Jagriti Vihar", "Gandhi Bagh", "Suraj Kund", 
+    "Transport Nagar", "Malyana", "Lisari Gate", "Shobhapur", "Rohta", 
+    "Janikhurd", "Machhra", "Saroorpur", "Phalauda", "Kithore", 
+    "Shahjahanpur", "Lawar", "Bahsuma", "Niloha", "Aminagar Sarai Road", 
+    "Garh Road", "Baghpat Road", "Hapur Road", "TP Nagar", "Railway Road", 
+    "Subhash Bazar", "Budhana Gate", "Sotiganj", "Nauchandi Area", 
+    "Medical College Area", "Panchli", "Shatabdi Nagar", "Mohiuddinpur"
+],
+"Baghpat": [
+    "Baghpat City", "Baraut", "Khekra", "Chhaprauli", "Aminagar Sarai", 
+    "Agarwal Mandi Tatiri", "Doghat", "Tikri", "Binauli", "Pilana", 
+    "Loni Road Area", "Old Town Baghpat", "Saray Chhabila", "Kotana", 
+    "Luhari", "Johri", "Bamnauli", "Dhikauli", "Sankrod", "Firozpur", 
+    "Katha", "Mavikalan", "Rataul", "Singhavali Ahir", "Chandi Nagar", 
+    "Badagaon", "Bali", "Dahina", "Pali", "Suwara", "Basantpur", 
+    "Kheri Pradhan", "Asara", "Banthala", "Fazilpur"
+],
+"Bulandshahr": [
+    "Bulandshahr City", "Khurja", "Sikandrabad", "Gulauthi", "Syana", 
+    "Dibai", "Narora", "Shikarpur", "Anupshahr", "Jahangirabad", 
+    "Pahasu", "Aurangabad", "Bhawan Bahadur Nagar", "Bugrasi", "Chhatari", 
+    "Khanpur", "Guraoli", "Arnia", "Bibi Nagar", "Agauta", "Lakhawati", 
+    "Unchagaon", "Danpur", "Kala Aam Chauraha", "Ansari Road", "Dhamera", 
+    "Walipura", "Maman Road", "Dharampur", "Javer Road Area", "Shivalaya", 
+    "Pothiram Market", "Khurja Junction", "Chola", "Kakore", "Dankaur Road", 
+    "Industrial Area Sikandrabad", "Pottery Colony Khurja", "Salempur", 
+    "Baral", "Gesupur", "Saidpur", "Bhamra", "Mawai", "Lohagara"
+],
+"Gautam_Budh_Nagar": [
+    "Noida Sector 1 to 168", "Greater Noida", "Dadri", "Jewar", "Surajpur", 
+    "Kasna", "Bisrakh", "Dankaur", "Rabupura", "Ecotech Industrial Area", 
+    "Knowledge Park 1 to 5", "Noida City Center", "Botanical Garden Area", 
+    "Pari Chowk", "Jagatanpur", "Bilaspur", "Jahangirpur", "Salarpur", 
+    "Bhangel", "Barola", "Mamura", "Nithari", "Gijhor", "Khora Colony Area", 
+    "Noida Extension (Greater Noida West)", "Alpha-Beta-Gamma Sectors", 
+    "Chipyana", "Haibatpur", "Saini", "Sunpura", "Aimnabad", "Tugalpur", 
+    "Gharbara", "Murtazapur", "Dhoom Manikpur", "Badalpur", "Jaracha", 
+    "Chhapraula", "Gautam Buddha University Area", "Yamuna Expressway Sector 18-20", 
+    "Achheja", "Tilpata", "Bodaki", "Ekotek 1-12", "NSEZ Noida", 
+    "Advant Navis Area", "Atta Market", "Logix Mall Area", "Sector 62-63 Hub"
+],
+"Hapur": [
+    "Hapur City", "Pilkhua", "Garhmukteshwar", "Dhaulana", "Simbhaoli", 
+    "Babugarh", "Brajghat", "Dasna Road Area", "Anand Vihar Hapur", 
+    "Preet Vihar", "Freeganj", "Kothi Gate", "Railway Road Hapur", 
+    "Galla Mandi Hapur", "Sikanderpur", "Nidhauli", "Hapur Bypass", 
+    "Jindal Nagar Area", "Gulaothi Road Hapur", "Chiryodakpur", 
+    "Kapurpur", "Tatarpur", "Satha", "Phuldera", "Lohari", 
+    "Girdharpur", "Shyampur", "Dahana", "Harsinghpur", "Salarpur", 
+    "Uvapur", "Bhawan Bahadur Nagar Road", "Dhaulana Industrial Area", 
+    "Pilkhua Textile Zone", "Ashok Nagar", "Devendra Puri", "Modinagar Road Area"
+],
+"Noida_Full_List": [
+    "Sector 1 to 15", "Sector 16 & 18 (Atta)", "Sector 12, 22, 24", 
+    "Sector 34 & 37 (City Center)", "Sector 50, 51, 52", "Sector 55 to 61", 
+    "Sector 62 & 63 (IT Hub)", "Sector 64 to 71", "Sector 74 to 79 (High-Rise)", 
+    "Sector 80 to 88 (Phase-2 Industrial)", "Sector 93 (Expressway)", 
+    "Sector 110, 128, 135 (IT Parks)", "Sector 142 to 150", "Sector 168", 
+    "Haroala", "Nithari", "Mamura", "Barola", "Bhangel", "Salarpur", 
+    "Gijhor", "Morna", "Chhalera", "Sorkha", "Gahlot", "Hazipur", 
+    "Nayagaon", "Yusufpur", "Gढ़ी Chaukhandi", "Behlolpur", "Wajidpur", 
+    "Noida Extension (Greater Noida West)", "Khora Colony Area", 
+    "Botanical Garden", "Golf Course Area", "NSEZ Area", "Advant Navis Hub"
+],
+
+"Ghaziabad": [
+    "Ghaziabad City", "Sahibabad Industrial Area", "Loni", "Modinagar", "Muradnagar", 
+    "Indirapuram", "Vaishali", "Vasundhara", "Kaushambi", "Raj Nagar", 
+    "Raj Nagar Extension", "Kavi Nagar", "Sanjay Nagar", "Vijay Nagar", 
+    "Pratap Vihar", "Khora Colony", "Loha Mandi", "Bulandshahr Road Industrial Area", 
+    "South Side GT Road", "Amrit Nagar", "Shalimar Garden", "Rajendra Nagar", 
+    "Mohan Nagar", "Arthala", "Nandgram", "Sihani", "Dundahera", 
+    "Crossing Republik", "Govindpuram", "Shastri Nagar Ghaziabad", "Hapur Road", 
+    "Loni Road Area", "Dasna", "Masuri", "Niwari", "Bhojpur", 
+    "Farrukhnagar", "Behta Hajipur", "Prahladgarhi", "Makarampur", 
+    "Bhopura", "Tulsi Niketan", "Hindon Airforce Area", "Chander Nagar", 
+    "Surya Nagar", "Shipra Sun City", "Abhay Khand", "Nyay Khand", "Shakti Khand"
+],
+"Agra": [
+    "Agra City", "Sikandra Industrial Area", "Nunihai", "Hing Ki Mandi", "Sanjay Place", 
+    "Shahganj", "Raja Ki Mandi", "Tajganj", "Dayalbagh", "Kamla Nagar", 
+    "Fatehabad", "Etmadpur", "Bah", "Kiravali", "Fatehpur Sikri", 
+    "Kheragarh", "Jagner", "Achhnera", "Pinahat", "Shamshabad Agra", 
+    "Saiyan", "Akola", "Bichpuri", "Barhan", "Khandauli", 
+    "Bodhla", "Lohamandi", "Mantola", "Nai Ki Mandi", "Belanganj", 
+    "Chhata Agra", "Rakabganj", "Pratabpura", "Idgah", "Shahdara Agra", 
+    "Trans Yamuna Colony", "Awas Vikas Colony", "Shastripuram", "Runukta", 
+    "Malpura", "Jarua Katra", "Rohta", "Dhanauli", "Sarsadh", 
+    "Tora", "Bamrauli", "Kuberpur", "Chauhatan", "Kagarol"
+],
+"Firozabad": [
+    "Firozabad City", "Shikohabad", "Tundla", "Sirsaganj", "Jasrana", 
+    "Makhanpur", "Araon", "Madanpur", "Eka", "Narkhi", 
+    "Chudi Bazar", "Galla Mandi Firozabad", "Bohra Bazar", "Jalesar Road", 
+    "Station Road Firozabad", "Vikas Nagar", "Sufraganj", "Ramgarh", 
+    "Dholpura", "Himalayan Colony", "Asafabad", "Sneh Nagar", "Dau Dayal", 
+    "Jain Nagar", "Makkhanpur Town", "Shikohabad Industrial Area", 
+    "Balaji Nagar", "Pashu Bazar", "Kheragarh Road", "Raja Ka Taal", 
+    "Nagla Badi", "Nagla Mirza", "Patti", "Bachgaon", "Kathfari", 
+    "Fariha", "Matsena", "Rupaspur", "Nagla Beech", "Sarsaini", 
+    "Khaidarpur", "Ghiror Road", "Etah Road Area", "Agra Road Firozabad"
+],
+"Mainpuri": [
+    "Mainpuri City", "Karhal", "Bewar", "Kuraoli", "Bhogaon", 
+    "Ghiror", "Kishni", "Barnahal", "Sultanganj", "Jyoti", 
+    "Kusamra", "Kurat", "Eka Road Area", "Agra Road Mainpuri", "Etawah Road", 
+    "Station Road", "Radha Raman Road", "Devi Road", "Lala Bazar", 
+    "Galla Mandi Mainpuri", "Naveen Mandi Bevar", "Dandiya", "Nagla Bari", 
+    "Saman (Bird Sanctuary Area)", "Onchha", "Ajeetganj", "Padham", 
+    "Ratanpur Bara", "Nabiganj", "Chharchha", "Paronkha", "Gopalpur", 
+    "Madanpur", "Dharau", "Udai", "Kharagpur", "Bidhuna Road Area", 
+    "Kachahri Road", "Civil Lines Mainpuri", "Mohalla Gher", "Bansigoh"
+],
+
+"Mathura": [
+    "Mathura City", "Vrindavan", "Kosi Kalan", "Chhata", "Govardhan", 
+    "Barsana", "Raya", "Mahavan", "Baldeo", "Nandgaon", 
+    "Refinery Area", "Holi Gate", "Deeg Gate", "Dampier Nagar", "Krishna Nagar", 
+    "Awas Vikas Colony", "Radha Kund", "Bajna", "Surir", "Naujhil", 
+    "Shergarh", "Chaumuha", "Farah", "Gokul", "Akshay Patra Area", 
+    "Vrindavan Cut", "Highway City", "Birla Mandir Area", "Masani", 
+    "Chandanvan", "Laxmi Nagar", "Aurangabad Mathura", "Sonkh", "Magorra", 
+    "Ol", "Paigaon", "Sahar Mathura", "Bajna Road", "Goverdhan Road", 
+    "Jait", "Garhi", "Bati", "Ral", "Mursan Road Area", "Tarauli"
+],
+
+"Aligarh": [
+    "Aligarh City", "Tala Nagri", "Khair", "Atrauli", "Iglas", 
+    "Gabhana", "Harduaganj", "Khereshwar", "Ramghat Road", "Quarsi", 
+    "Sarsol", "Sasnigate", "Dehligate", "Upper Kot", "Center Point", 
+    "Railway Road", "AMU Area", "Civil Lines Aligarh", "Dodalpur", "Jawan", 
+    "Tappal (Jewar Border)", "Lodha", "Akrabad", "Gangiri", "Chandaus", 
+    "Dhanipur", "Panethi", "Madrak", "Kauriyaganj", "Vannoi", 
+    "Pala Sahibabad", "Naurangabad", "Vishnupuri", "Gandhi Nagar Aligarh", "Sarai Hakim", 
+    "Hamdard Nagar", "Surendra Nagar", "Mansisingh Park Area", " प्रदर्शनी मैदान (Exhibition Ground)", 
+    "Industrial Estate", "Boner", "Satha", "Bijauli", "Mursan Road", "Pisawa"
+],
+
+"Etah": [
+    "Etah City", "Jalesar", "Aliganj", "Marhara", "Sakit", 
+    "Nidhauli Kalan", "Jaithra", "Avagarh", "Sheetalpur", "Raja Ka Rampur", 
+    "Sarsol एटा", "G.T. Road Etah", "Thandi Sadak", "Mandi Parishad Etah", 
+    "Kachahri Road", "Civil Lines Etah", "Mayas", "Karahari", "Dhumri", 
+    "Patiyali Road Area", "Shanti Nagar", "Arun Nagar", "Railway Road Etah", 
+    "Babuganj", "Jalesar Road", "Agra Road Etah", "Kanchiram Colony", 
+    "Pilua", "Bagwala", "Sirsaganj Road Area", "Malawan", "Kusha", 
+    "Bhalia", "Nandgaon Etah", "Pavaas", "Dhirpur", "Ganjdundwara Road Area", 
+    "Mirhachi", "Sahawar Road", "Jawaharpur", "Puranpur"
+],
+
+"Hathras": [
+    "Hathras City", "Sadabad", "Sikandra Rao", "Mursan", "Sasni", 
+    "Hasayan", "Sahpau", "Hathras Junction", "Naya Ganj", "Mursan Gate", 
+    "Sadabad Gate", "Agra Road Hathras", "Aligarh Road Hathras", "Ramanpur", 
+    "Purana Sahar", "Chawar Gate", "Hanuman Ganj", "Lala Ka Nagla", 
+    "Kila Gate", "Kachahri Road", "Civil Lines Hathras", "Mandu", 
+    "Bisana", "Mohan Ganj", "Chandpa", "Iglas Road Area", "Jalesar Road Area", 
+    "Pachawali", "Sokhana", "Khurja Road Hathras", "Garhi Tamna", 
+    "Rati Ka Nagla", "Sahar Hathras", "Agsauli", "Dariyapur", 
+    "Purdil Nagar", "Khasganj Road Area", "Lakhnu", "Tursen", "Bhenai"
+],
+
+"Kasganj": [
+    "Kasganj City", "Ganjdundwara", "Soron Ji", "Patiali", "Sahawar", 
+    "Amampur", "Sidhpura", "Laxmiganj", "Sadar Bazar Kasganj", "Railway Road", 
+    "Nadrai Gate", "Bilram Gate", "Barahdwari", "Ashok Nagar", "Tehsil Road", 
+    "Kachahri Road", "Sahar Kasganj", "Bilram", "Mohanpura", "Dholna", 
+    "Nameni", "Suawar", "Pachlana", "Thara", "Sikandarpur Vaishya", 
+    "Kadir Ganj", "Dhantiya", "Ganeshpur", "Mandi Samiti Kasganj", 
+    "Etah Road Area", "Bareilly Road Kasganj", "Budaun Road Area", 
+    "Mahanandpur", "Gadhka", "Basupura", "Nardoli", "Kila Street", 
+    "Naurangabad Kasganj", "Ganga Ghat Area", "Pichhla Ganj"
+],
+"Bareilly": [
+    "Bareilly City", "Parsakhera Industrial Area", "CB Ganj", "Faridpur", "Aonla", 
+    "Baheri", "Nawabganj", "Mirganj", "Bithri Chainpur", "Bhojipura", 
+    "Izatnagar", "Civil Lines Bareilly", "Kila", "Qutubkhana", "Koharapeer", 
+    "Shyamganj", "Subhash Nagar", "Rajendra Nagar", "Model Town", "Pashupati Nath Area", 
+    "IVRI Road", "Kargaina", "Rampur Garden", "Bareilly Cantt", "Airforce Area Bareilly", 
+    "Shahi", "Shergarh", "Fatehganj West", "Fatehganj East", "Rithora", 
+    "Dhaura Tanda", "Senthal", "Richha", "Deoranian", "Kyara", 
+    "Majhgawan", "Alampur Jafrabad", "Bhuta", "Shergarh Road Area", "Surkha", 
+    "Bibi Chauraha", "Naukati", "Delapeer", "Phoenix Mall Area", "Suresh Sharma Nagar", 
+    "Hartman Road", "Narayani Colony", "Karamchari Nagar", "Mini Bypass"
+],
+
+"Budaun": [
+    "Budaun City", "Ujhani", "Sahaswan", "Bisauli", "Dataganj", 
+    "Bilsi", "Islam Nagar", "Wazirganj", "Kadar Chowk", "Usawan", 
+    "Dahgawan", "Ambiapur", "Miyanur", "Asafpur", "Samrer", 
+    "Kachahri Road Budaun", "Sadar Bazar Budaun", "Civil Lines Budaun", 
+    "Lal Pul", "Indra Chowk", "Navi Nagar", "Sotiana", "Maulvi Tola", 
+    "Shakti Nagar", "Railway Station Road Budaun", "Ujhani Industrial Area", 
+    "Babrala Road", "Bareilly Road Budaun", "Aonla Road Area", "Ghatpuri", 
+    "Kakrala", "Sakhanu", "Kunwargaon", "Gulariya", "Gautra", 
+    "Saidpur", "Mundia", "Paraur", "Faizganj Behta", "Rudayan", 
+    "Bhamori", "Karkauli", "Binawar", "Allapur", "Bura Bhadaura"
+],
+"Pilibhit": [
+    "Pilibhit City", "Puranpur", "Bisalpur", "Barkhera", "Bilsanda", 
+    "Amaria", "Lalaurikhera", "Jahanabad", "Majhola", "Kalinagar", 
+    "Galla Mandi Pilibhit", "Sungadhi", "Deshnagar", "Station Road Pilibhit", 
+    "Tanpur Road", "Bareilly Road Pilibhit", "Assam Road", "Civil Lines Pilibhit", 
+    "Nakta Dana", "Ballabh Nagar", "Ghosiyana", "Pakariya", "Sherpur", 
+    "Madhotanda", "Gajraula", "Neoria Husainpur", "Nyoria", "Bhagwantapur", 
+    "Intaurora", "Kamlapur", "Marauri", "Khamariya", "Paihan", 
+    "Shahgarh", "Dhanara Ghat", "Chuka Beach Area", "Hazara", "Kabirganj", 
+    "Jadopur", "Kandharpur", "Muzaffarnagar Pilibhit", "Banskhera"
+],
+
+"Shahjahanpur": [
+    "Shahjahanpur City", "Roza", "Tilhar", "Puwayan", "Jalalabad", 
+    "Katra", "Khutar", "Banda", "Nigohi", "Kant", 
+    "Madanpur", "Kalan", "Mirzapur", "Bhaval Khera", "Sindhauli", 
+    "Jaitipur", "Dadraul", "Town Hall Shahjahanpur", "Bahadurganj", "Sadar Bazar", 
+    "Lodhipur", "Kachahri Road", "Civil Lines Shahjahanpur", "Railway Station Road", 
+    "Azizganj", "Garra Fatak", "Tareenpur", "Chauhari", "Mandi Parishad", 
+    "OCF Area", "Rosa Thermal Power Plant Area", "Rice Mill Cluster Puwayan", 
+    "Paraur", "Sehramau", "Khuda Ganj", "Dhaka", "Allaganj", 
+    "Ghua Chauraha", "Kandharpur", "Barua", "Sherganj", "Basantapur", 
+    "Nayagaon", "Gulariya", "Rath"
+],
+
+"Moradabad": [
+    "Moradabad City", "Peetal Basti", "Majhola", "Kanth", "Thakurdwara", 
+    "Bilari", "Kundarki", "Line Par", "Budhhi Vihar", "Lohia Nagar", 
+    "Civil Lines Moradabad", "Katra Naz", "Burtan Bazar", "Sambhal Road", 
+    "Rampur Road Moradabad", "Mundha Pande", "Chhajlet", "Bhagatpur Tanda", 
+    "Pakbara", "Agwanpur", "Railway Colony Moradabad", "Prince Road", 
+    "Ganj Moradabad", "Asalatpura", "Faizganj", "Indira Chowk", 
+    "Manohar Pura", "Daurau", "Lakri Fazalpur", "Dalpatpur", 
+    "Mahlakpur", "Sonakpur", "Tari Khana", "Bhojpur Dharampur", 
+    "Sirkho", "Pipalsana", "Bahjoi Road Area", "Mandi Samiti Moradabad", 
+    "Transport Nagar", "Harthala", "Mian Sarai", "Gulabbari"
+],
+
+"Bijnor": [
+    "Bijnor City", "Nagina", "Najibabad", "Dhampur", "Sherkot", 
+    "Chandpur", "Nehtaur", "Seohara", "Kiratpur", "Noorpur", 
+    "Afzalgarh", "Jhalu", "Mandawar", "Haldaur", "Warhapur", 
+    "Sahu Jain Road", "Shakti Chowk", "Naveen Mandi Bijnor", "Civil Lines Bijnor", 
+    "Jatane Road", "Kiratpur Road", "Nagina Road Area", "Wood Craft Cluster Nagina", 
+    "Brush Industrial Zone Sherkot", "Dhampur Sugar Mill Area", "Kotwali", 
+    "Meerapur", "Akbarabad", "Swaheri", "Daranagar", "Ganj", 
+    "Basta", "Pheena", "Azampur", "Rehar", "Kaluwala", "Barkala", 
+    "Saadpur", "Triveni Sugar Mill Area", "Bundki", "Saini", "Nihtaur Road"
+],
+
+"Amroha": [
+    "Amroha City", "Gajraula", "Zoya", "Dhanaura", "Hasanpur", 
+    "Bachhraon", "Gangeshwari", "Naugawan Sadat", "Joytiiba Phule Nagar", 
+    "Railway Station Road Amroha", "Bazar Shafaat Pura", "Kotwali Road", 
+    "Mohalla Kot", "Dholak Cluster Amroha", "Industrial Area Gajraula", 
+    "National Highway 24 Hub", "Mandi Dhanaura", "Ujhari", "Rehra", 
+    "Saidangli", "Pali", "Chuchela Kalan", "Kailsa", "Dhakka", 
+    "Salarpur", "Bagadpur", "Amroha Dehat", "Kanth Road Amroha", 
+    "Sambhal Road Area", "Bijnor Road Area", "Tigri (Ganga Mela Area)", 
+    "Khaspur", "Malakpur", "Beura", "Fatiyapur", "Rampur Road Zoya", 
+    "Khaikhera", "Shahpur", "Ahraula", "Ghosipura"
+],
+"Rampur": [
+    "Rampur City", "Shahabad", "Bilaspur", "Milak", "Suar", 
+    "Tanda", "Chamraua", "Saidnagar", "Jwala Nagar", "Miston Ganj", 
+    "Shahabad Gate", "Civil Lines Rampur", "Railway Road Rampur", "Mandi Samiti", 
+    "Industrial Estate Rampur", "Panwaria", "Dhamora", "Kemri", 
+    "Maswasi", "Patwai", "Ajitpur", "Ganj Rampur", "Safdarganj", 
+    "Topkhana", "Nainital Road Rampur", "Bareilly Road Rampur", "Moradabad Road", 
+    "Bazpur Road Area", "Rathonda", "Kalyanpur", "Dandiya", 
+    "Khusropur", "Bhot", "Sarkhal", "Narpat Nagar", "Loha Bazar", 
+    "Chaku Bazar", "Khasbagh Area", "Mohalla Qila", "Puranpur Rampur"
+],
+
+"Sambhal": [
+    "Sambhal City", "Chandausi", "Bahjoi", "Gunnaur", "Babrala", 
+    "Hayat Nagar", "Chaudhary Sarai", "Deepa Sarai", "Asmoli", "Pawansa", 
+    "Rajpura", "Junawai", "Baniyather", "Mandi Samiti Chandausi", "Station Road Sambhal", 
+    "Hassanpur Road", "Moradabad Road Sambhal", "Agra Road Chandausi", "Sirsi", 
+    "Aitaye", "Sondhan", "Kudafatehgarh", "Majhola Sambhal", "Nawanagar", 
+    "Dhanari", "Bhiraoti", "Gawan", "Narottam Sarai", "Tatar Pur", 
+    "Saidpur Ima", "Fatehpur", "Lakhori", "Shahbazpur", "Fakharpur", 
+    "Sarai Tarin", "Madhan", "B भाँकले (Bhankla)", "Chandausi Industrial Area", 
+    "Mentha Mandi Area", "Horn & Bone Cluster"
+],
+
+"Saharanpur": [
+    "Saharanpur City", "Deoband", "Behat", "Gangoh", "Nakur", 
+    "Rampur Maniharan", "Sarsawa", "Chhutmalpur", "Nanauta", "Sultanpur Chilkana", 
+    "Nagals", "Fatehpur", "Ambala Road Saharanpur", "Chakrata Road", "Court Road", 
+    "Railway Road Saharanpur", "Wood Market (Lakri Bazar)", "Naveen Mandi Saharanpur", "Star Paper Mill Area", "ITC Road", 
+    "Gill Colony", "Awas Vikas Saharanpur", "Bajoria Road", "Khalapar", "Lohani Sarai", 
+    "Mandi Samiti Deoband", "Gagalheri", "Bhagwanpur Road Area", "Talheri Buzurg", "Titron", 
+    "Badgaon Saharanpur", "Kalsiya", "Mirzapur Pole", "Haridwar Road Saharanpur", "Delhi Road Area", 
+    "Shakti Nagar", "Pratap Nagar", "Janakpuri Saharanpur", "Hasanpur", "Manoharpur", 
+    "Behat Road Cluster", "Roorkee Road Area", "Saini Mansoorpur", "Kailashpur", "Ganeshpur"
+],
+"Muzaffarnagar": [
+    "Muzaffarnagar City", "Khatauli", "Budhana", "Jansath", "Shahpur", 
+    "Purkazi", "Mansurpur", "Begrajpur Industrial Area", "New Mandi (Nai Mandi)", 
+    "Bhopa Road", "Jansath Road", "Roorkee Road Muzaffarnagar", "Meerut Road", 
+    "Shamli Road Area", "Civil Lines Muzaffarnagar", "South Civil Lines", 
+    "Gandhi Colony", "Ansari Road", "Court Road Muzaffarnagar", "Almaspur", 
+    "Kukra", "Nandpuri", "Mustafabad", "Charthawal", "Tidwi", 
+    "Baghra", "Titawi", "Sikka", "Lalu Kheri", "Shahdabbar", 
+    "Kairana Road Area", "Ramraj", "Mirapur", "Khera", "Kawal", 
+    "Jhal", "Sisauli (Kisan Union Area)", "Kandhla Road Area", "Phugana", 
+    "Bhalwa", "Nunsari", "Sohanjani", "Bela", "Galibpur", "Khampur"
+],
+"Shamli": [
+    "Shamli City", "Kairana", "Kandhla", "Thana Bhawan", "Jalalabad Shamli", 
+    "Jhinjhana", "Banat", "Ailum", "Garhi Pukhta", "Unn", "Babri", 
+    "Kheri Karmu", "Shamli Industrial Area", "Delhi Road Shamli", 
+    "Panipat Road Shamli", "Meerut Road Shamli", "Muzaffarnagar Road Area", 
+    "Karnal Road Area", "Hanuman Tilla", "Vikas Nagar Shamli", 
+    "Adarsh Mandi", "Arya Puri", "Naveen Mandi Shamli", "Lilu Kheri", 
+    "Dhimanpura", "Ajitganj", "Kandhla Road Area", "Bidoli", "Bhanwada", 
+    "Gogwan", "Sikka", "Butrada", "Titarwara", "Bhainsani", "Kandela"
+],
+
+"Chitrakoot": [
+    "Karwi (District HQ)", "Chitrakoot Dham", "Rajapur", "Manikpur", 
+    "Mau", "Pahadi", "Ramnagar Chitrakoot", "Bharat Kup", "Sitapur Chitrakoot", 
+    "Kamta Nath Area", "Ram Ghat", "Gupt Godavari Area", "Hanuman Dhara", 
+    "Sati Anusuya Area", "Janaki Kund", "Khohi", "Shivrampur", "Bargarh", 
+    "Raipura", "Lakhanpur", "Tikra", "Byohara", "Surajpur", "Mau Mustafa", 
+    "Tarunwa", "Lodhwara", "Sangrampur", "Pili Kothi Area", "Bedipulia", 
+    "Old Bazar Karwi", "Lohia Nagar", "Railway Station Road", "Tiraha Karwi", 
+    "Kusumhi", "Banshipur", "Naya Gaon", "Amanpur", "Rishiyan", "Kandhi", 
+    "Deokali", "Banka", "Chhivlaha", "Barahmafi", "Suryakund"
+],
+
+"Banda": [
+    "Banda City", "Atarra", "Baberu", "Naraini", "Tindwari", 
+    "Kamasin", "Jaspura", "Mahua", "Bishanda", "Oran", 
+    "Mataundh", "Girwan", "Kalinjar", "Pailani", "Balkhandi Naka", 
+    "Atarra Chungi", "Kachahri Road Banda", "Station Road Banda", "Civil Lines Banda", 
+    "Chhavni", "Khurhand", "Badokhar Khurd", "Pangara", "Badausa", 
+    "Kartal", "Gureh", "Chilla", "Siras", "Sindhan Kalan", 
+    "Mahuwa Road", "Jaurahi", "Khera", "Pathramani", "Jamwara", 
+    "Naveen Mandi Banda", "Rice Mill Cluster Atarra", "Shajar Stone Hub", 
+    "Ken River Area", "Triveni", "Murtirampur", "Pipahri"
+],
+"Hamirpur": [
+    "Hamirpur City", "Maudaha", "Rath", "Sumerpur", "Sarila", 
+    "Muskara", "Kurara", "Gohand", "Bharua Sumerpur", "Jalapur", 
+    "Behuni", "Majhgawan", "Biwar", "Kundaura", "Pauthiya", 
+    "Sudar Bazar Hamirpur", "Kachahri Road", "Station Road", "Industrial Area Sumerpur", 
+    "Yamuna Bank Area", "Betwa Bank Area", "Naveen Mandi Maudaha", "Baswari", 
+    "Chhani", "Rira", "Ingohta", "Kharanj", "Pachkhura", "Itraura", 
+    "Sarsai", "Mundera", "Tikauli", "Rirua", "Bilgaon", "Silauli", 
+    "Umari", "Aunta", "Geondi", "Sisolar", "Bhauli", "Kandhauli", "Pattipur"
+],
+
+"Mahoba": [
+    "Mahoba City", "Kabrai", "Charkhari", "Kulpahar", "Jaitpur", 
+    "Khanna", "Srinagar Mahoba", "Panwari", "Ajnar", "Bela Tal", 
+    "Alha Chowk", "Keerat Sagar Area", "Haveli Darwaza", "Station Road Mahoba", 
+    "Hamirpur Road Mahoba", "Charkhari Road", "Kulpahar Mandi", "Naveen Mandi Mahoba", 
+    "Stone Crusher Zone Kabrai", "Makarbai", "Bijalpur", "Sijhari", 
+    "Supa", "Urwara", "Bamhauri", "Gisai", "Kuncha", 
+    "Tilauli", "Bagwa", "Pipra", "Basrehi", "Salat", 
+    "Imilia", "Patha", "Mahobkanth", "Rawatpura", "Barat", 
+    "Darari", "Goyra", "Ladpur", "Murtirampur"
+],
+"Jhansi": [
+    "Jhansi City", "Mauranipur", "Babina", "Moth", "Garautha", 
+    "Tahrauli", "Barua Sagar", "Chirgaon", "Sipri Bazar", "Elite Crossing", 
+    "Sadar Bazar Jhansi", "Jhansi Fort Area", "Railway Colony Jhansi", "BHEL Area", 
+    "Hansari", "Bijoli Industrial Area", "Gwalior Road Jhansi", "Kanpur Road Jhansi", 
+    "Naveen Mandi Jhansi", "Khushipura", "Nandanpura", "Nagras", 
+    "Isagarh", "Pachaur", "Bamauli", "Datiya Gate", "Orchha Gate", 
+    "Laxmi Gate", "Sainiyar", "Bhasneh", "Kakarwai", "Ranipur", 
+    "Gursarai", "Erich", "Sakrar", "Poonchh", "Samthar", 
+    "Mandi Mauranipur", "Talbehat Road Area", "Shivpuri Road", "Kochhabhanwar", 
+    "Ambapawai", "Dhikoli", "Bamer", "Garhia"
+],
+
+"Jalaun": [
+    "Orai (District HQ)", "Jalaun City", "Konch", "Kalpi", "Madhogarh", 
+    "Kadaura", "Kuthaund", "Nadigaon", "Dakor", "Churkhi", 
+    "Rampura", "Ait", "Bhend", "Umri", "Hardoi Gari", 
+    "Station Road Orai", "Konch Road Orai", "Shaheed Bhagat Singh Chowk", "Bajaja Bazar", 
+    "Galla Mandi Orai", "Industrial Estate Orai", "Handmade Paper Hub Kalpi", "Yamuna Bridge Area", 
+    "Pindari", "Sarsai", "Gopalpura", "Khardeh", "Sihari", 
+    "Bangra", "Bohra", "Atariya", "Bhadrekhi", "Mungawali", 
+    "Piriya", "Sora", "Naveen Mandi Konch", "Kanpur Road Orai", "Jhansi Road Orai", 
+    "Tulsi Nagar", "Rajendra Nagar Orai", "Gopal Ganj", "Ramganj", "Indira Nagar"
+],
+
+"Lalitpur": [
+    "Lalitpur City", "Talbehat", "Mehroni", "Madawara", "Pali", 
+    "Jakhaura", "Bar", "Birdha", "Rajghat", "Matatila", 
+    "Devgarh", "Banpur", "Gidwaha", "Bailwara", "Kailgawan", 
+    "Station Road Lalitpur", "Civil Lines Lalitpur", "Kachahri Road", "Ghanta Ghar Area", 
+    "Industrial Area Rajghat Road", "Granite Cluster Lalitpur", "Naveen Mandi Lalitpur", 
+    "Tilaula", "Dhaura", "Kelgawan", "Bansi", "Jiron", 
+    "Sironkhurd", "Soudar", "Narhat", "Dongra Kalan", "Saidpur", 
+    "Dhaura Station", "Bijroutha", "Kandhari", "Masora", "Pura Birdha", 
+    "Pipra", "Bamhori", "Silgan", "Gona", "Karmana"
+],
+
+"Mirzapur": [
+    "Mirzapur City", "Vindhyachal", "Chunar", "Lalganj", "Marihan", 
+    "Ahraura", "Jamalpur", "Narayanpur", "Sikhar", "Rajgarh", 
+    "Halia", "Pahadi", "Majhawa", "Kon", "Chhanbey", 
+    "Vasilganj", "Dankin Ganj", "Gantantra Chowk", "Station Road Mirzapur", "Civil Lines Mirzapur", 
+    "Kachahri Road", "Sankat Mochan Area", "Budhnath", "Teda Road", 
+    "Chunar Fort Area", "Pottery Cluster Chunar", "Stone Mining Belt Ahraura", "Carpet Belt Mirzapur", 
+    "Adalhat", "Kachhwa", "Gaura", "Sindhaura", "Bari", 
+    "Patehara", "Dighiya", "Drummondganj", "Lusa", "Jigna", 
+    "Gaipura", "Birohi", "Kudra", "Naveen Mandi Mirzapur", "Galla Mandi Chunar"
+],
+"Bhadohi": [
+    "Bhadohi City", "Gyanpur", "Gopiganj", "Aurai", "Suriyawan", 
+    "Khamariya", "Abholi", "Digh", "Chaman Chowk", "Rajpura", 
+    "Station Road Bhadohi", "Indira Mill Area", "Maryadpatti", "Katra Bazar Bhadohi", 
+    "Naveen Mandi Bhadohi", "Galla Mandi Gyanpur", "Jangiganj", "Lalanagar", 
+    "Moratila", "Parsipur", "Sarai Jagdish", "Bariya Pur", "Ugapur", 
+    "Koirauna", "Bhikhampur", "Ghosia", "Modh", "Bhanpur", 
+    "Saray Kanshray", "Babu Ganj", "Mali Pur", "Tulsipur", "Maharajganj Bhadohi", 
+    "Saray Inayat", "Dhuripur", "Barki", "Umar Pur", "Mandwa"
+],
+
+"Sonbhadra": [
+    "Robertsganj (District HQ)", "Obra", "Renukoot", "Anpara", "Shaktinagar", 
+    "Chopan", "Dala", "Duddhi", "Ghorawal", "Myorpur", 
+    "Churk", "Pipri", "Bina", "Khadia", "Jayant", 
+    "Dharmshala Chowk", "Station Road Robertsganj", "Churk Road", "Civil Lines Robertsganj", 
+    "Naveen Mandi Robertsganj", "Karma", "Kon", "Babhani", "Nagwa", 
+    "Chatra", "Ramgarh", "Silpi", "Pannuganj", "Raipur Sonbhadra", 
+    "Bijul", "Lodhi", "Mahuari", "Karsua", "Bari", 
+    "Kakrahi", "Sinduria", "Gursand", "Muirpur Airport Area", "Hindalco Colony Area", 
+    "NCL Colony", "Obra Dam Area", "Rihand Dam Area", "Kanhar Dam Area"
+],
+
+"Azamgarh": [
+    "Azamgarh City", "Mubarakpur", "Nizamabad", "Phulpur", "Lalganj", 
+    "Jiyanpur", "Sagari", "Atraulia", "Mehnagar", "Burhanpur", 
+    "Sathiaon", "Bilariyaganj", "Sarai Mir", "Martinganj", "Thekma", 
+    "Mohammadpur", "Jahanaganj", "Rani Ki Sarai", "Tarwa", "Palhana", 
+    "Ahiraula", "Pawai", "Tahbarpur", "Ajmatgarh", "Harraiya", 
+    "Raidopur", "Sidhari", "Civil Lines Azamgarh", "Chowk Azamgarh", "Railway Station Road", 
+    "Khaurampur", "Baddopur", "Koiriyapar", "Mahuwa", "Kandraeshpur", 
+    "Amilo (Weaving Hub)", "Sarai Mohan", "Katghar", "Heerapatti", "Kartalpur", 
+    "Belaisa Industrial Area", "Sugar Mill Road Sathiaon", "Naveen Mandi Azamgarh"
+],
+"Ballia": [
+    "Ballia City", "Rasra", "Bairia", "Bansdih", "Belthara Road", 
+    "Sahatwar", "Manier", "Reoti", "Nagra", "Chilkahar", 
+    "Sohrabyen", "Sikanderpur", "Haldharpur", "Dubhar", "Gadwar", 
+    "Chowk Ballia", "Station Road Ballia", "Vijay Cinema Road", "Civil Lines Ballia", 
+    "Bhrigu Ashram Area", "Japlin Ganj", "Kadam Tar", "Okauna", 
+    "Murali Chhapra", "Harnatar", "Bakwa", "Surmanpur", "Jai Prabha Setu Area", 
+    "Manjhi Bridge Area", "Khejuri", "Narahi", "Kurem", "Piparkala", 
+    "Sugar Mill Area Rasra", "Naveen Mandi Ballia", "Galla Mandi Rasra", 
+    "Chandpur", "Turtipar", "Ibrahim Patti", "Ratanpura Road"
+],
+
+"Mau": [
+    "Mau Nath Bhanjan", "Ghosi", "Madhuban", "Mohammadabad Gohna", "Copaganj", 
+    "Dohri Ghat", "Adari", "Chiraiyakot", "Mirzahadipur", "Bhiti", 
+    "Sahadatpura", "Ballia Mod", "Gazipur Mod", "Station Road Mau", "Civil Lines Mau", 
+    "Ratanpura", "Kurthi Jafarpur", "Fatehpur Tal Ratoy", "Indara", "Amila", 
+    "Boraari", "Sajhauli", "Surajpur", "Pali", "Khairabad", 
+    "Walidpur", "Ranipur", "Pardaha", "Badraon", "Ghughua", 
+    "Sultanpur Mau", "Dharamshi Pur", "Khadarganj", "Kasara", "Lidiyari", 
+    "Dandikhas", "Kalyanpur Mau", "Sarai Lakhansi", "Galla Mandi Mau", 
+    "Naveen Mandi Madhuban", "Powerloom Cluster Mau", "Yarn Market Area"
+],
+        },
+        
+        
+  "Bihar": { "All":["Patna", "Gaya", "Bhagalpur", "Muzaffarpur", "Purnia", "Darbhanga"],
+  },
+  "Gujarat": { "All":["Ahmedabad", "Surat", "Vadodara", "Rajkot", "Vapi", "Morbi"],
+  },
+  "Madhya Pradesh": { "All":["Indore", "Bhopal", "Gwalior", "Jabalpur", "Rewa", "Satna"],
+  },
+  "Odisha": { "All":["Bhubaneswar", "Cuttack", "Rourkela", "Sambalpur", "Paradip"],
+  },
+  "Karnataka":{ "All": ["Bengaluru", "Mysuru", "Hubli", "Mangaluru", "Belgaum"],
+  },
+  "Kerala": { "All":["Kochi", "Thiruvananthapuram", "Kozhikode", "Thrissur", "Palakkad"],
+    
+  },
+  "Rajasthan": { "All":["Jaipur", "Jodhpur", "Kota", "Bikaner", "Udaipur", "Bhilwara"],
+},
+
+        
+          };
+
+    function updateDistricts() {
+        const state = document.getElementById("stateInput").value;
+        const districtSelect = document.getElementById("districtInput");
+        districtSelect.innerHTML = '<option value="">-- जिला चुनें --</option>';
+        if (state && fullData[state]) {
+            Object.keys(fullData[state]).sort().forEach(district => {
+                let opt = document.createElement("option");
+                opt.value = district; opt.text = district;
+                districtSelect.add(opt);
+            });
+        }
+    }
+
+    function updateCities() {
+        const state = document.getElementById("stateInput").value;
+        const district = document.getElementById("districtInput").value;
+        const citySelect = document.getElementById("cityInput");
+        citySelect.innerHTML = '<option value="">-- शहर चुनें --</option>';
+        if (state && district && fullData[state][district]) {
+            fullData[state][district].sort().forEach(city => {
+                let opt = document.createElement("option");
+                opt.value = city; opt.text = city;
+                citySelect.add(opt);
+            });
+        }
+    }
+
+    // असली सर्च फंक्शन
+    function searchWorkers() {
+        const city = document.getElementById('cityInput').value;
+        const work = document.getElementById('workInput').value;
+        const resultsDiv = document.getElementById('results');
+
+        if (!city || !work) {
+            alert("कृपया शहर और काम चुनें!");
+            return;
+        }
+
+        // आपकी नई वाली लिंक
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx7i54hKon1Dizk_ZgP6tpjNolJINeYLxPD4UdncQwMZUpUHgO4GI-NhzSC5o8IpaeZ/exec";
+
+        resultsDiv.innerHTML = "<p style='text-align:center;'>⏳ कारीगरों की सूची लोड हो रही है...</p>";
+
+        // Google Sheets से डेटा खींचना
+        fetch(`${SCRIPT_URL}?action=search&city=${encodeURIComponent(city)}&work=${encodeURIComponent(work)}`)
+        .then(response => response.json())
+        .then(data => {
+            resultsDiv.innerHTML = "";
+            if (data.length === 0) {
+                resultsDiv.innerHTML = `<div class="worker-card" style="text-align:center; border-left-color:red;">
+                    <p style="color:red;">❌ क्षमा करें, ${city} में अभी कोई ${work} नहीं मिला।</p>
+                </div>`;
+            } else {
+                                data.forEach(worker => {
+                    resultsDiv.innerHTML += `
+                        <div class="worker-card">
+                            <h3>👤 ${worker.name}</h3>
+                            <p>🛠️ <b>काम:</b> ${worker.work}</p>
+                            <p>📍 <b>शहर:</b> ${worker.city}</p>
+                            
+                            <a href="login-choice.html" class="call-btn">अभी बुक करें</a>
+                        </div>
+                  
+
+                    `;
+                });
+            }
+        })
+        .catch(err => {
+            resultsDiv.innerHTML = "<p style='color:red; text-align:center;'>❌ नेटवर्क एरर! कृपया दोबारा प्रयास करें।</p>";
+        });
+    }
+</script>
+
+</body>
+</html>
