@@ -9,14 +9,13 @@
         .form-container { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); width: 300px; }
         h2 { color: #e67e22; margin-bottom: 20px; text-align: center; }
         
-        /* इनपुट बॉक्स स्टाइल */
         input { 
             width: 100%; 
             padding: 15px; 
             margin: 8px 0; 
             border: 1px solid #ccc; 
             border-radius: 5px; 
-            box-sizing: border-box; /* इससे पैडिंग बाहर नहीं निकलती */
+            box-sizing: border-box; 
         }
 
         .submit-btn { 
@@ -33,6 +32,41 @@
         
         .submit-btn:hover { background: #d35400; }
         .back { display: block; text-align: center; margin-top: 15px; color: gray; text-decoration: none; font-size: 14px; }
+
+        /* पॉप-अप स्टाइल */
+        #workerModal {
+            display: none; 
+            position: fixed; 
+            z-index: 9999; 
+            left: 0; top: 0; 
+            width: 100%; height: 100%; 
+            background-color: rgba(0,0,0,0.7); 
+        }
+        .modal-content {
+            background-color: #fff;
+            margin: 10% auto;
+            padding: 20px;
+            border-radius: 10px;
+            width: 85%;
+            max-width: 500px;
+            text-align: left;
+            font-family: Arial, sans-serif;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        .modal-header { color: #d9534f; font-size: 20px; font-weight: bold; margin-bottom: 15px; text-align: center; }
+        .modal-body { font-size: 15px; line-height: 1.6; color: #333; max-height: 350px; overflow-y: auto; }
+        .modal-footer { text-align: center; margin-top: 20px; }
+        .agree-btn {
+            background-color: #5cb85c;
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            font-weight: bold;
+            width: 100%;
+        }
     </style>
 </head>
 <body>
@@ -40,56 +74,26 @@
 <div class="form-container">
     <h2>वर्कर पंजीकरण</h2>
     
-
    <form id="workerForm">
-    <input type="text" id="regName" name="regName" placeholder="पूरा नाम" required>
-    <div style="display: flex; gap: 5px; margin-bottom: 10px;">
-    <select name="countryCode" style="width: 85px; padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 14px;">
-        <option value="+91">+91 (IN)</option>
-        <option value="+966">+966 (SA)</option>
-        <option value="+971">+971 (UAE)</option>
-    </select>
+        <input type="text" id="regName" name="regName" placeholder="पूरा नाम" required>
+        <div style="display: flex; gap: 5px; margin-bottom: 10px;">
+            <select name="countryCode" style="width: 85px; padding: 12px; border: 1px solid #ccc; border-radius: 8px;">
+                <option value="+91">+91 (IN)</option>
+                <option value="+966">+966 (SA)</option>
+                <option value="+971">+971 (UAE)</option>
+            </select>
 
-    <input type="tel" 
-           name="regMobile" 
-           id="regMobile"
-           placeholder="मोबाइल नंबर (10 अंक)" 
-           pattern="[0-9]{10}" 
-           title="कृपया 10 अंकों का सही मोबाइल नंबर डालें" 
-           maxlength="10" 
-           oninput="this.value = this.value.replace(/[^0-9]/g, '');"
-           style="flex: 1; padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 16px; box-sizing: border-box;"
-           required>
-</div>
-<div style="width: 100%; margin-bottom: 10px;">
-    <input type="tel" 
-           name="regAadhar" 
-           id="regAadhar"
-           placeholder="आधार कार्ड नंबर (12 अंक)" 
-           pattern="[0-9]{12}" 
-           title="आधार कार्ड 12 अंकों का होना चाहिए" 
-           maxlength="12" 
-           oninput="this.value = this.value.replace(/[^0-9]/g, '');"
-           style="width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 16px; box-sizing: border-box; display: block;"
-           required>
-</div>
+            <input type="tel" name="regMobile" id="regMobile" placeholder="मोबाइल नंबर (10 अंक)" pattern="[0-9]{10}" maxlength="10" oninput="this.value = this.value.replace(/[^0-9]/g, '');" style="flex: 1; padding: 12px; border: 1px solid #ccc; border-radius: 8px;" required>
+        </div>
+        
+        <input type="tel" name="regAadhar" id="regAadhar" placeholder="आधार कार्ड नंबर (12 अंक)" pattern="[0-9]{12}" maxlength="12" oninput="this.value = this.value.replace(/[^0-9]/g, '');" required>
+        <input type="text" name="regAddress" id="regAddress" placeholder="पूरा पता (गाँव,कसबा,मकान नंबर)" required>
+        <input type="text" name="regCity" id="regCity" placeholder="अपना शहर लिखें" required>
 
-<input type="text" name="regAddress"
-id="regAddress",
-placeholder="पूरा पता (गाँव,कसबा,मकान नंबर/गली)" required>
-    
-<input type="text" name="regCity"
-id="regCity"
-placeholder="अपना शहर लिखें (जैसे: ब्लॉक का नाम,और शहर, जिला)" required>
-
-<div class="form-group">
-    <label for="workInput" style="display: block; margin-bottom: 8px; font-weight: bold;">
-        अपना काम चुनें (Select Your Work):
-    </label>
-    
-    <select id="workInput" name="regWork" required 
-        style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #ccc; font-size: 16px;">
-        <option value="">-- यहाँ क्लिक करके चुनें --</option>
+        <div class="form-group">
+            <select id="workInput" name="regWork" required style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #ccc;">
+                <option value="">-- अपना काम चुनें --</option>
+                     
         <option value="Plumber">प्लंबर (Plumber)</option>
         <option value="Electrician">इलेक्ट्रीशियन (Electrician)</option>
         <option value="Carpenter">बढ़ई (Carpenter)</option>
@@ -100,57 +104,66 @@ placeholder="अपना शहर लिखें (जैसे: ब्लॉ�
         <option value="Tiles Mistri">टाइल्स मिस्त्री (Tiles Mistri)</option>
         <option value="Labour">मजदूर (Labour)</option>
         <option value="Other">अन्य (Other)</option>
-    </select>
-</div>
+            </select>
+        </div>
 
-
-
-
-  
-     <input type="hidden" name="userType" value="worker">
-
-    <button type="submit" class="submit-btn">सबमिट करें</button>
-    
-    ​"काम की तलाश छोड़िए, अब काम खुद आपके पास आएगा! 🛠️"
-​'My Indian Workers' से जुड़ें और अपनी कला की सही कीमत पाएं।
-न भाग-दौड़ की चिंता, न पैसों का झंझट—बस काम पर ध्यान दें, बाकी हम संभालेंगे।
-    
-</form>
-<div style="text-align:center; margin-top:20px;">
-  
-  
-        <h3>वर्कर अपनी हाजिरी दर्ज करें 👇</h3>
-  
-    <button onclick="window.location.href='attendance.html'" 
-            style="background:#2c3e50; color:white; padding:15px 30px; border:none; border-radius:10px; font-weight:bold; cursor:pointer; width:90%; font-size:18px;">
-      
+        <input type="hidden" name="userType" value="worker">
         
-      
-        📸 वर्कर हाजिरी (Attendance)
-    </button>
+        <button type="button" class="submit-btn" onclick="showWorkerWarning()">सबमिट करें</button>
+    </form>
+
+    <div style="text-align:center; margin-top:20px;">
+        <h3>वर्कर अपनी हाजिरी दर्ज करें 👇</h3>
+        <button onclick="window.location.href='attendance.html'" style="background:#2c3e50; color:white; padding:15px; border:none; border-radius:10px; font-weight:bold; cursor:pointer; width:90%; font-size:18px;">
+            📸 वर्कर हाजिरी (Attendance)
+        </button>
+    </div>
+
+    <a href="login-choice.html" class="back">← वापस जाएँ</a>
 </div>
 
-<div style="background:white; padding:20px; border-radius:15px; box-shadow:0 4px 8px rgba(0,0,0,0.1);">
-    
+<div id="workerModal">
+    <div class="modal-content">
+        <div class="modal-header">⚠️ ज़रूरी सूचना - My Indian Workers</div>
+        <div class="modal-body">
+            <p><strong>रुकिए!</strong> यदि आप कंपनी के साथ लाइफटाइम तक काम करना चाहते हैं, तो ध्यान दें:</p>
+            <ul>
+                <li><strong>ईमानदारी:</strong> आप मालिक से मिलकर कंपनी को धोखा नहीं देंगे। काम का पैसा आप स्वयं नकद (Cash) नहीं लेंगे। मालिक से कहें कि पेमेंट सीधे कंपनी के खाते में जमा करें।</li>
+                <li><strong>रिपोर्टिंग:</strong> काम खत्म होने के बाद आपको 'Work Completed' फॉर्म सबमिट करना होगा।</li>
+                <li><strong>काम की गारंटी:</strong> आप कंपनी को जितना फायदा पहुँचाएंगे, आपको उतना ही ज्यादा काम मिलेगा।</li>
+                <li><strong>सावधान:</strong> यदि आप सीधी डीलिंग करते हैं, तो कंपनी आपको हमेशा के लिए <b>ब्लॉक</b> कर देगी।</li>
+            </ul>
+            <p style="text-align:center;"><b>अब आप खुद सोचिए, आपको पूरी लाइफ काम करना है या सिर्फ एक दिन के लिए?</b></p>
+        </div>
+        <div class="modal-footer">
+            <button class="agree-btn" onclick="closeWorkerModal()">मैं सहमत हूँ और ईमानदारी से काम करूँगा</button>
+        </div>
+    </div>
 </div>
-
-
-   <a href="login-choice.html" class="back">← वापस जाएँ</a>
-</div>
-    <script src="script.js"></script>
-    
 
 <script>
-    // अपना लिंक यहाँ डालें
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx7i54hKon1Dizk_ZgP6tpjNolJINeYLxPD4UdncQwMZUpUHgO4GI-NhzSC5o8IpaeZ/exec"; 
 
-    document.getElementById('workerForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        const btn = e.target.querySelector('button');
+    // 1. पॉप-अप दिखाने वाला फंक्शन
+    function showWorkerWarning() {
+        const form = document.getElementById('workerForm');
+        if(form.checkValidity()) {
+            document.getElementById("workerModal").style.display = "block";
+        } else {
+            alert("कृपया पहले फॉर्म की पूरी जानकारी सही-सही भरें।");
+        }
+    }
+
+    // 2. सहमति के बाद डेटा भेजने वाला फंक्शन
+    function closeWorkerModal() {
+        document.getElementById("workerModal").style.display = "none";
+        
+        const form = document.getElementById('workerForm');
+        const btn = form.querySelector('.submit-btn');
         btn.innerText = "⏳ प्रोसेसिंग...";
         btn.disabled = true;
 
-        const formData = new FormData(this);
+        const formData = new FormData(form);
         const data = {};
         formData.forEach((value, key) => { data[key] = value; });
 
@@ -164,12 +177,11 @@ placeholder="अपना शहर लिखें (जैसे: ब्लॉ�
         }).catch(() => {
             alert("कुछ गड़बड़ हुई, दोबारा प्रयास करें।");
             btn.disabled = false;
+            btn.innerText = "सबमिट करें";
         });
-    });
+    }
 </script>
-
 
 </body>
 </html>
-
-: <input type="hidden" name="userType" value="worker">
+<input type="hidden" name="userType" value="worker">
