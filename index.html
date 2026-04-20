@@ -111,15 +111,15 @@
     </div>
 
     <button type="button" onclick="toggleChat()" style="display: flex; align-items: center; background: #1a73e8; padding: 12px 22px; border-radius: 50px; cursor: pointer; box-shadow: 0 8px 25px rgba(26, 115, 232, 0.5); border: none; outline: none;">
-        <div style="width: 35px; height: 35px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px;">🤖</div>
+        <div style="width: 35px; height: 35px; background: white; borde8r-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px;">🤖</div>
         <span style="color: white; font-weight: bold; font-size: 15px; margin-left: 12px; white-space: nowrap;">Booking Chat Bot</span>
     </button>
 </div>
 
 
 <script>
-    // आपकी API Key यहाँ पहले से सेट है
-    const BOT_API_KEY = "AIzaSyAp9jJhU9tC2_Uo7ujEMXZJ7RAjfHoACeE"; 
+    // आपकी API Key यहाँ पहले से ही है
+    const BOT_API_KEY = "AIzaSyA_0TjJpODhRcWRBkGhYVmAOYuXbWy0X70"; 
 
     async function handleBotSend(manualText) {
         const input = document.getElementById('bot-user-input');
@@ -129,78 +129,47 @@
 
         if (!text) return;
 
-        // आप का मैसेज स्क्रीन पर दिखाना
-        messages.innerHTML += `<div style="background: #e3f2fd; padding: 10px 14px; border-radius: 15px 15px 0px 15px; align-self: flex-end; max-width: 85%; word-wrap: break-word;"><b>आप:</b> ${text}</div>`;
+        messages.innerHTML += `<div style="background: #e3f2fd; padding: 10px 14px; border-radius: 15px 15px 0px 15px; align-self: flex-end; max-width: 85%; word-wrap: break-word; margin-bottom: 5px;"><b>आप:</b> ${text}</div>`;
         input.value = '';
-        status.innerText = "मैनेजर टाइप कर रहा है...";
+        status.innerText = "मैनेजर जवाब दे रहा है...";
         messages.scrollTop = messages.scrollHeight;
 
         try {
-            // हमने यहाँ 'v1beta' और सबसे स्टेबल मॉडल 'gemini-1.5-flash' का इस्तेमाल किया है
+            // हमने यहाँ Proxy का इस्तेमाल किया है जो हर मोबाइल ब्राउज़र पर चलेगा
             const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${BOT_API_KEY}`;
+            const proxyUrl = "https://corsproxy.io/?" + encodeURIComponent(apiUrl);
 
-            const response = await fetch(apiUrl, {
+            const response = await fetch(proxyUrl, {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
+                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
-                    contents: [{
-                        parts: [{ text: `तुम "My Indian Workers" के मैनेजर हो। हमारे पास प्लंबर, मिस्त्री, इलेक्ट्रिशियन हैं। ग्राहक का जवाब हिंदी में विनम्र और छोटा दो: ${text}` }]
-                    }]
+                    contents: [{ parts: [{ text: `तुम "My Indian Workers" के मैनेजर हो। हिंदी में छोटा और विनम्र जवाब दो: ${text}` }] }]
                 })
             });
 
             const data = await response.json();
-
-            if (data.error) {
-                console.error("Google API Error:", data.error.message);
-                throw new Error(data.error.message);
-            }
-
+            
             if (data.candidates && data.candidates[0].content.parts[0].text) {
                 let reply = data.candidates[0].content.parts[0].text;
-                messages.innerHTML += `<div style="background: white; padding: 10px 14px; border-radius: 15px 15px 15px 0px; border: 1px solid #eee; color: #1a73e8; max-width: 85%; word-wrap: break-word;"><b>बॉट:</b> ${reply}</div>`;
+                messages.innerHTML += `<div style="background: white; padding: 10px 14px; border-radius: 15px 15px 15px 0px; border: 1px solid #eee; color: #1a73e8; max-width: 85%; word-wrap: break-word; margin-bottom: 5px;"><b>बॉट:</b> ${reply}</div>`;
             } else {
-                throw new Error("No candidates found");
+                throw new Error("No response from AI");
             }
-
         } catch (e) {
-            console.error("Final catch error:", e);
-            messages.innerHTML += `<div style="background: #ffebee; padding: 10px 14px; border-radius: 10px; color: #c62828; font-size: 12px; margin-top: 5px;">
-                क्षमा करें, रिस्पांस नहीं मिला। <br>
-                1. इंटरनेट कनेक्शन चेक करें। <br>
-                2. पक्का करें कि आपकी API Key एक्टिव है।
-            </div>`;
+            console.error(e);
+            messages.innerHTML += `<div style="background: #ffebee; padding: 10px 14px; border-radius: 10px; color: #c62828; font-size: 12px;">क्षमा करें, रिस्पांस नहीं मिला। 10 मिनट बाद फिर कोशिश करें या नई API Key बनाएं।</div>`;
         }
         
         status.innerText = "";
         messages.scrollTop = messages.scrollHeight;
     }
 
-    // चैट बॉक्स खोलने और बंद करने के लिए
     function toggleChat() {
         const box = document.getElementById('gemini-chat-box');
         box.style.display = (box.style.display === 'none' || box.style.display === '') ? 'flex' : 'none';
-        if(box.style.display === 'flex') document.getElementById('bot-user-input').focus();
     }
-
-    // माइक कंट्रोल
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (SpeechRecognition) {
-        const recognition = new SpeechRecognition();
-        recognition.lang = 'hi-IN';
-        document.getElementById('mic-btn').onclick = () => { 
-            recognition.start(); 
-            document.getElementById('bot-status').innerText = "सुन रहा हूँ..."; 
-        };
-        recognition.onresult = (e) => { 
-            handleBotSend(e.results[0][0].transcript); 
-        };
-    }
-
-    document.getElementById('bot-user-input').onkeypress = (e) => { if(e.key === "Enter") handleBotSend(); };
 </script>
+
 
 
 
