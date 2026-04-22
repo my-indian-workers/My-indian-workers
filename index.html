@@ -23,19 +23,37 @@
 </head>
 <body>
   
-  
 
 
-    <header>
-    <nav class="navbar">
-        <div class="logo">My Indian Workers</div>
-        <ul class="nav-links">
-            <li><a href="home-content.html">होम</a></li>
-            <li><a href="services.html">सेवाएं</a></li>
-            <li><a href="login-choice.html">लॉगिन</a></li>
+<header style="background-color: #2c3e50; padding: 12px 15px; box-shadow: 0 4px 8px rgba(0,0,0,0.3); border-bottom: 2px solid #34495e;">
+    <nav style="display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto; font-family: Arial, sans-serif;">
+        
+        <div style="font-size: 23px; font-weight: 900; white-space: nowrap; letter-spacing: 1px; 
+                    background: linear-gradient(to right, #FF9933, #FFFFFF, #138808); 
+                    -webkit-background-clip: text; 
+                    -webkit-text-fill-color: transparent;
+                    text-shadow: 1px 1px 2px rgba(0,0,0,0.2);">
+            My Indian Workers
+        </div>
+
+        <ul style="list-style: none; display: flex; align-items: center; gap: 5px; margin: 0; padding: 0;">
+            <li>
+                <a href="home-content.html" id="navHome" style="text-decoration: none; background-color: #3498db; color: #ffffff !important; padding: 1px 1px; border-radius: 6px; font-weight: bold; font-size: 12px; display: inline-block; border: 1px solid #2980b9;">होम</a>
+            </li>
+            <li>
+                <a href="services.html" id="navServices" style="text-decoration: none; background-color: #3498db; color: #ffffff !important; padding: 1px 1px; border-radius: 6px; font-weight: bold; font-size: 12px; display: inline-block; border: 1px solid #2980b9;">सेवाएं</a>
+            </li>
+            <li>
+                <a href="login-choice.html" id="navLogin" style="text-decoration: none; background-color: #3498db; color: #ffffff !important; padding: 1px 1px; border-radius: 6px; font-weight: bold; font-size: 12px; display: inline-block; border: 1px solid #2980b9;">लॉगिन</a>
+            </li>
+            <li>
+                <button id="langBtn" onclick="toggleLanguage()" style="background-color: #27ae60; color: #ffffff !important; border: 1px solid #1e8449; padding: 1px 1px; border-radius: 6px; font-weight: bold; font-size: 12px; cursor: pointer; display: inline-block;">English</button>
+            </li>
         </ul>
     </nav>
 </header>
+
+
 
 
 
@@ -276,6 +294,62 @@
 
 
 
+<script>
+function toggleLanguage() {
+    const btn = document.getElementById('langBtn');
+    
+    // बदलने वाले सभी एलिमेंट्स को पकड़ना
+    const navHome = document.getElementById('navHome');
+    const navServices = document.getElementById('navServices');
+    const navLogin = document.getElementById('navLogin');
+    const welcomeH2 = document.querySelector('.welcome-overlay h2');
+    const welcomeP = document.querySelector('.welcome-overlay p');
+    const heroH1 = document.querySelector('.hero-content h1');
+    const heroP = document.querySelector('.hero-content p');
+    const searchBtn = document.querySelector('#hero button');
+    const noticeP = document.querySelector('div[style*="background: #fff4e5"] p');
+    const comingSoonH2 = document.querySelector('main h2');
+    const comingSoonP = document.querySelector('main p');
+    const contactH2 = document.querySelector('#contact h2');
+    const footerText = document.querySelector('footer p');
+
+    if (btn.innerText === "English") {
+        btn.innerText = "हिंदी";
+        
+        // --- ENGLISH TEXT ---
+        navHome.innerText = "Home";
+        navServices.innerText = "Services";
+        navLogin.innerText = "Login";
+        welcomeH2.innerText = "Welcome";
+        welcomeP.innerText = "Connecting India's most hardworking workers directly with owners.";
+        heroH1.innerHTML = "Right Workers<br>For Right Work";
+        heroP.innerHTML = "Electricians, Plumbers, Carpenters and more<br>now just a click away.";
+        if(searchBtn) searchBtn.innerText = "🔍 Search Workers";
+        if(noticeP) noticeP.innerHTML = "📢 Your Digital Platform --* For registration and booking, first click 'Search Workers' button then confirm through <span style='color: #d35400;'>'Login/AI Booking Chatbot'</span>.";
+        comingSoonH2.innerText = "Our Services Coming Soon";
+        comingSoonP.innerText = "Connecting best workers from every city of India.";
+        contactH2.innerText = "Contact Us";
+        footerText.innerHTML = "© 2026 <span class='brand-name'>My Indian Workers</span> | 'First choice of Indian Workers'";
+    } else {
+        btn.innerText = "English";
+        
+        // --- वापस हिंदी टेक्स्ट ---
+        navHome.innerText = "होम";
+        navServices.innerText = "सेवाएं";
+        navLogin.innerText = "लॉगिन";
+        welcomeH2.innerText = "आपका स्वागत है";
+        welcomeP.innerText = "हम भारत के सबसे मेहनती वर्कर्स और कारीगरों को सीधे मालिकों से मिलाते हैं।";
+        heroH1.innerHTML = "सही काम के लिए<br>सही कारीगर";
+        heroP.innerHTML = "इलेक्ट्रिशियन, प्लंबर, कारपेंटर और अन्य सभी<br>श्रेणी के अनुभवी वर्कर अब एक क्लिक पर।";
+        if(searchBtn) searchBtn.innerText = "🔍 कारीगर की खोज करें";
+        if(noticeP) noticeP.innerHTML = "📢 आपका अपना डिजिटल प्लेटफॉर्म --* रजिस्ट्रेशन और वर्कर बुकिंग के लिए सबसे पहले 'कारीगर की खोज करें' बटन पर क्लिक करके वर्कर सर्च करें फिर <span style='color: #d35400;'>'लॉगिन/या हमारा डिजिटल AI. \"Booking Chat Baot\"'</span> के द्वारा अपनी बुकिंग कन्फर्म करें ।";
+        comingSoonH2.innerText = "हमारी सेवाएं जल्द ही आ रही हैं";
+        comingSoonP.innerText = "हम भारत के हर शहर के बेहतरीन वर्कर्स को इस प्लेटफॉर्म से जोड़ रहे हैं।";
+        contactH2.innerText = "संपर्क करें";
+        footerText.innerHTML = "© 2026 <span class='brand-name'>My Indian Workers</span> | 'भारतीय कारीगरों की पहली पसंद'";
+    }
+}
+</script>
 
 
 
