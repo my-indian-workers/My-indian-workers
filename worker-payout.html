@@ -3,27 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>वर्कर पेमेंट - My Indian Workers</title>
+    <title>वर्कर पेमेंट - All-in-One Payout</title>
+    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
     <style>
-        body { background-color: #f4f7f6; font-family: 'Segoe UI', sans-serif; padding: 10px; display: flex; justify-content: center; }
+        body { background-color: #f4f7f6; font-family: 'Segoe UI', sans-serif; padding: 10px; display: flex; flex-direction: column; align-items: center; }
         .form-card { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 100%; max-width: 500px; text-align: center; border-top: 5px solid #27ae60; }
         h2 { color: #27ae60; margin-bottom: 15px; }
-        input, select { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ccc; border-radius: 8px; font-size: 16px; box-sizing: border-box; }
+        input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ccc; border-radius: 8px; font-size: 16px; box-sizing: border-box; }
         .submit-btn { width: 100%; background-color: #27ae60; color: white; border: none; padding: 15px; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; transition: 0.3s; margin-top: 10px; }
         .submit-btn:hover { background-color: #219150; }
-        .warning-box { background: #fff3cd; color: #856404; padding: 12px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #ffeeba; font-size: 14px; text-align: left; }
         .method-box { padding: 15px; border-radius: 8px; margin-bottom: 10px; text-align: left; border: 1px solid #eee; }
         .bg-green { background: #eafaf1; }
         .bg-gray { background: #f4f7f6; }
-        label { font-weight: bold; cursor: pointer; }
+        label { font-weight: bold; cursor: pointer; display: block; width: 100%; }
+        #canvas { display: none; }
     </style>
 </head>
 <body>
 
 <div class="form-card">
     <h2>वर्कर पेमेंट (Payout)</h2>
-    <div class="warning-box"><strong>💰 ध्यान दें:</strong> पेमेंट करने के लिए मोबाइल में PhonePe या GPay होना जरूरी है।</div>
-
+    
     <form id="payoutForm">
         <input type="text" id="workerName" placeholder="वर्कर का नाम" required>
         <input type="number" id="payoutAmount" placeholder="पेमेंट राशि (Amount) ₹" required>
@@ -57,25 +57,27 @@
             <label><input type="radio" name="payMethod" onclick="toggleFields('qrDiv')"> 4. बारकोड / QR Code द्वारा</label>
             <div id="qrDiv" style="display:none;">
                 <input type="file" id="qrCodeFile" accept="image/*">
-                <p style="font-size: 12px; color: red;">* बारकोड अपलोड करके सबमिट करें।</p>
+                <p style="font-size: 12px; color: red;">* बारकोड की फोटो चुनें, सिस्टम अपने आप स्कैन कर लेगा।</p>
             </div>
         </div>
         
-        <button type="button" onclick="makePayment()" id="payBtn" class="submit-btn">💸 पेमेंट शुरू करें</button>
+        <button type="button" onclick="processPayment()" id="payBtn" class="submit-btn">💸 पेमेंट शुरू करें</button>
     </form>
 </div>
 
+<canvas id="canvas"></canvas>
+
 <script>
+// सभी डिवीजनों को सही से दिखाने/छिपाने का फंक्शन
 function toggleFields(divId) {
     const ids = ['upiDiv', 'bankDiv', 'phoneDiv', 'qrDiv'];
-    ids.forEach(id => document.getElementById(id).style.display = 'none');
+    ids.forEach(id => {
+        document.getElementById(id).style.display = 'none';
+    });
     document.getElementById(divId).style.display = 'block';
 }
 
-
-
-
-function makePayment() {
+async function processPayment() {
     const name = document.getElementById('workerName').value;
     const amount = document.getElementById('payoutAmount').value;
     
@@ -84,52 +86,69 @@ function makePayment() {
         return;
     }
 
-    let upiUrl = "";
-
     // 1. UPI ID द्वारा
     if (document.getElementById('upiDiv').style.display !== 'none') {
         const upi = document.getElementById('workerUPI').value;
         if(!upi) { alert("UPI ID भरें!"); return; }
-        upiUrl = `upi://pay?pa=${upi}&pn=${encodeURIComponent(name)}&am=${amount}&cu=INR`;
+        launchUPI(upi, name, amount);
     } 
     
-    // 2. मोबाइल नंबर द्वारा (GPay/PhonePe)
-    else if (document.getElementById('phoneDiv').style.display !== 'none') {
-        const phone = document.getElementById('workerPhone').value;
-        if(phone.length < 10) { alert("सही मोबाइल नंबर भरें!"); return; }
-        // मोबाइल नंबर के लिए @apl या @ybl लिंक का उपयोग होता है
-        upiUrl = `upi://pay?pa=${phone}@apl&pn=${encodeURIComponent(name)}&am=${amount}&cu=INR`;
-    }
-
-    // अगर लिंक बना है, तो उसे खोलें
-    if (upiUrl !== "") {
-        // window.open मोबाइल ब्राउज़र पर बेहतर काम करता है
-        window.open(upiUrl, '_self');
-        
-        // एक बैकअप अलर्ट (अगर ब्राउज़र ब्लॉक करे)
-        setTimeout(() => {
-            alert("अगर पेमेंट ऐप नहीं खुला, तो सुनिश्चित करें कि आपके फोन में GPay/PhonePe इंस्टॉल है।");
-        }, 2000);
-    }
-    
-    // बैंक अकाउंट के लिए सूचना
+    // 2. बैंक अकाउंट द्वारा (सूचना)
     else if (document.getElementById('bankDiv').style.display !== 'none') {
         const acc = document.getElementById('bankAcc').value;
         const ifsc = document.getElementById('bankIFSC').value;
-        alert(`बैंक ट्रांसफर के लिए जानकारी:\nअकाउंट: ${acc}\nIFSC: ${ifsc}\n\nइसे कॉपी करें और अपने बैंकिंग ऐप में जाकर पेमेंट करें।`);
+        if(!acc || !ifsc) { alert("बैंक डिटेल्स भरें!"); return; }
+        alert(`बैंक ट्रांसफर डिटेल्स:\nनाम: ${name}\nअकाउंट: ${acc}\nIFSC: ${ifsc}\n\nइसे कॉपी करें और अपने बैंकिंग ऐप से मैन्युअल ट्रांसफर करें।`);
     }
-    
-    // QR कोड के लिए सूचना
+
+    // 3. मोबाइल नंबर द्वारा
+    else if (document.getElementById('phoneDiv').style.display !== 'none') {
+        const phone = document.getElementById('workerPhone').value;
+        if(phone.length < 10) { alert("सही मोबाइल नंबर भरें!"); return; }
+        // मोबाइल नंबर को UPI लिंक में बदलना
+        launchUPI(`${phone}@ybl`, name, amount);
+    }
+
+    // 4. असली QR कोड स्कैनर
     else if (document.getElementById('qrDiv').style.display !== 'none') {
-        alert("QR कोड स्कैन करने के लिए इसे गैलरी में सेव करें और अपने पेमेंट ऐप से फोटो अपलोड करें।");
+        const fileInput = document.getElementById('qrCodeFile');
+        if (fileInput.files.length === 0) { alert("QR कोड फोटो चुनें!"); return; }
+
+        const file = fileInput.files[0];
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const img = new Image();
+            img.onload = function() {
+                const canvas = document.getElementById('canvas');
+                const ctx = canvas.getContext('2d');
+                canvas.width = img.width; canvas.height = img.height;
+                ctx.drawImage(img, 0, 0);
+                const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                const code = jsQR(imageData.data, imageData.width, imageData.height);
+                
+                if (code) {
+                    let upiUrl = code.data;
+                    // लिंक में अमाउंट जोड़ना अगर नहीं है
+                    if(!upiUrl.includes('am=')) {
+                        upiUrl += `&am=${amount}`;
+                    }
+                    window.location.href = upiUrl;
+                } else {
+                    alert("फोटो में बारकोड नहीं मिला! कृपया साफ़ फोटो अपलोड करें।");
+                }
+            };
+            img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
     }
 }
 
-
-
-
-
-
+// UPI ऐप खोलने के लिए कॉमन फंक्शन
+function launchUPI(pa, pn, am) {
+    const url = `upi://pay?pa=${pa}&pn=${encodeURIComponent(pn)}&am=${am}&cu=INR`;
+    window.location.href = url;
+}
 </script>
+
 </body>
 </html>
