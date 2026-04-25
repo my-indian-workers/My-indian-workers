@@ -34,7 +34,7 @@
         <div class="method-box bg-green">
             <label><input type="radio" name="payMethod" onclick="toggleFields('upiDiv')" checked> 1. UPI ID द्वारा</label>
             <div id="upiDiv">
-                <input type="text" id="workerUPI" placeholder="UPI ID (जैसे: 9876543210@ybl)">
+                <input type="text" id="workerUPI" placeholder="UPI ID (जैसे: abc@ybl)">
             </div>
         </div>
 
@@ -47,7 +47,7 @@
         </div>
 
         <div class="method-box bg-green">
-            <label><input type="radio" name="payMethod" onclick="toggleFields('phoneDiv')"> 3. मोबाइल नंबर (GPay/PhonePe)</label>
+            <label><input type="radio" name="payMethod" onclick="toggleFields('phoneDiv')"> 3. मोबाइल नंबर (Paytm/GPay/PhonePe)</label>
             <div id="phoneDiv" style="display:none;">
                 <input type="tel" id="workerPhone" placeholder="10 अंकों का मोबाइल नंबर" maxlength="10">
             </div>
@@ -57,7 +57,7 @@
             <label><input type="radio" name="payMethod" onclick="toggleFields('qrDiv')"> 4. बारकोड / QR Code द्वारा</label>
             <div id="qrDiv" style="display:none;">
                 <input type="file" id="qrCodeFile" accept="image/*">
-                <p style="font-size: 12px; color: red;">* बारकोड की फोटो चुनें, सिस्टम अपने आप स्कैन कर लेगा।</p>
+                <p style="font-size: 12px; color: red;">* बारकोड की फोटो चुनें, सिस्टम स्कैन कर लेगा।</p>
             </div>
         </div>
         
@@ -68,7 +68,6 @@
 <canvas id="canvas"></canvas>
 
 <script>
-// सभी डिवीजनों को सही से दिखाने/छिपाने का फंक्शन
 function toggleFields(divId) {
     const ids = ['upiDiv', 'bankDiv', 'phoneDiv', 'qrDiv'];
     ids.forEach(id => {
@@ -86,30 +85,23 @@ async function processPayment() {
         return;
     }
 
-    // 1. UPI ID द्वारा
     if (document.getElementById('upiDiv').style.display !== 'none') {
         const upi = document.getElementById('workerUPI').value;
         if(!upi) { alert("UPI ID भरें!"); return; }
         launchUPI(upi, name, amount);
     } 
-    
-    // 2. बैंक अकाउंट द्वारा (सूचना)
     else if (document.getElementById('bankDiv').style.display !== 'none') {
         const acc = document.getElementById('bankAcc').value;
         const ifsc = document.getElementById('bankIFSC').value;
         if(!acc || !ifsc) { alert("बैंक डिटेल्स भरें!"); return; }
         alert(`बैंक ट्रांसफर डिटेल्स:\nनाम: ${name}\nअकाउंट: ${acc}\nIFSC: ${ifsc}\n\nइसे कॉपी करें और अपने बैंकिंग ऐप से मैन्युअल ट्रांसफर करें।`);
     }
-
-    // 3. मोबाइल नंबर द्वारा
     else if (document.getElementById('phoneDiv').style.display !== 'none') {
         const phone = document.getElementById('workerPhone').value;
         if(phone.length < 10) { alert("सही मोबाइल नंबर भरें!"); return; }
-        // मोबाइल नंबर को UPI लिंक में बदलना
-        launchUPI(`${phone}@ybl`, name, amount);
+        // मोबाइल नंबर के लिए @paytm, @ybl या @ibl में से @paytm सबसे वर्सेटाइल है
+        launchUPI(`${phone}@paytm`, name, amount);
     }
-
-    // 4. असली QR कोड स्कैनर
     else if (document.getElementById('qrDiv').style.display !== 'none') {
         const fileInput = document.getElementById('qrCodeFile');
         if (fileInput.files.length === 0) { alert("QR कोड फोटो चुनें!"); return; }
@@ -128,9 +120,10 @@ async function processPayment() {
                 
                 if (code) {
                     let upiUrl = code.data;
-                    // लिंक में अमाउंट जोड़ना अगर नहीं है
                     if(!upiUrl.includes('am=')) {
-                        upiUrl += `&am=${amount}`;
+                        // सुरक्षित रूप से पैरामीटर जोड़ना
+                        const separator = upiUrl.includes('?') ? '&' : '?';
+                        upiUrl += `${separator}am=${amount}&pn=${encodeURIComponent(name)}&cu=INR`;
                     }
                     window.location.href = upiUrl;
                 } else {
@@ -143,27 +136,13 @@ async function processPayment() {
     }
 }
 
-// UPI ऐप खोलने के लिए कॉमन फंक्शन
 function launchUPI(pa, pn, am) {
-    // 1. UPI ID को साफ करें (अगर कोई स्पेस हो तो हटा दें)
     let finalPa = pa.trim();
-    
-    // 2. अगर सिर्फ मोबाइल नंबर है, तो @ybl जोड़ें
-    if (!finalPa.includes('@')) {
-        finalPa = finalPa + "@ybl";
-    }
-
-    // 3. Transaction ID बनाना (इससे बैंक को भरोसा होता है कि पेमेंट असली है)
-    const transactionId = "TXN" + Date.now();
-
-    // 4. Final URL (इसमें mc=5411 और mode=02 मर्चेंट पेमेंट्स के लिए बहुत जरूरी हैं)
-    const url = `upi://pay?pa=${finalPa}&pn=${encodeURIComponent(pn)}&am=${am}&cu=INR&tn=Karigar_Payout&tr=${transactionId}&mc=5411&mode=02&purpose=00`;
-
-    // 5. ऐप खोलना
+    const tid = "TXN" + Date.now();
+    // मर्चेंट कोड 5411 और मोड 02 को हटाकर साधारण लिंक बनाया है जो Paytm और अन्य ऐप्स पर ज्यादा चलता है
+    const url = `upi://pay?pa=${finalPa}&pn=${encodeURIComponent(pn)}&am=${am}&cu=INR&tn=Karigar_Payout&tr=${tid}`;
     window.location.href = url;
 }
-
-
 </script>
 
 </body>
