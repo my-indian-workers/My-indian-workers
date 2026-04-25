@@ -72,41 +72,64 @@ function toggleFields(divId) {
     document.getElementById(divId).style.display = 'block';
 }
 
+
+
+
 function makePayment() {
     const name = document.getElementById('workerName').value;
     const amount = document.getElementById('payoutAmount').value;
     
     if(!name || !amount) {
-        alert("नाम और राशि भरें!");
+        alert("कृपया नाम और राशि भरें!");
         return;
     }
 
-    // 1. अगर UPI ID चुना है
+    let upiUrl = "";
+
+    // 1. UPI ID द्वारा
     if (document.getElementById('upiDiv').style.display !== 'none') {
         const upi = document.getElementById('workerUPI').value;
         if(!upi) { alert("UPI ID भरें!"); return; }
-        window.location.href = `upi://pay?pa=${upi}&pn=${encodeURIComponent(name)}&am=${amount}&cu=INR`;
+        upiUrl = `upi://pay?pa=${upi}&pn=${encodeURIComponent(name)}&am=${amount}&cu=INR`;
     } 
     
-    // 2. अगर मोबाइल नंबर चुना है
+    // 2. मोबाइल नंबर द्वारा (GPay/PhonePe)
     else if (document.getElementById('phoneDiv').style.display !== 'none') {
         const phone = document.getElementById('workerPhone').value;
         if(phone.length < 10) { alert("सही मोबाइल नंबर भरें!"); return; }
-        // मोबाइल नंबर को UPI लिंक में बदलने के लिए @apl या @ybl इस्तेमाल होता है
-        window.location.href = `upi://pay?pa=${phone}@apl&pn=${encodeURIComponent(name)}&am=${amount}&cu=INR`;
+        // मोबाइल नंबर के लिए @apl या @ybl लिंक का उपयोग होता है
+        upiUrl = `upi://pay?pa=${phone}@apl&pn=${encodeURIComponent(name)}&am=${amount}&cu=INR`;
     }
 
-    // 3. अगर बैंक या बारकोड चुना है (इनमें सीधे ऐप नहीं खुलता)
-    else if (document.getElementById('bankDiv').style.display !== 'none') {
-        alert("बैंक पेमेंट के लिए जानकारी कॉपी करें और अपने बैंक ऐप (SBI/GPay) में जाकर 'Bank Transfer' करें।");
+    // अगर लिंक बना है, तो उसे खोलें
+    if (upiUrl !== "") {
+        // window.open मोबाइल ब्राउज़र पर बेहतर काम करता है
+        window.open(upiUrl, '_self');
+        
+        // एक बैकअप अलर्ट (अगर ब्राउज़र ब्लॉक करे)
+        setTimeout(() => {
+            alert("अगर पेमेंट ऐप नहीं खुला, तो सुनिश्चित करें कि आपके फोन में GPay/PhonePe इंस्टॉल है।");
+        }, 2000);
     }
     
+    // बैंक अकाउंट के लिए सूचना
+    else if (document.getElementById('bankDiv').style.display !== 'none') {
+        const acc = document.getElementById('bankAcc').value;
+        const ifsc = document.getElementById('bankIFSC').value;
+        alert(`बैंक ट्रांसफर के लिए जानकारी:\nअकाउंट: ${acc}\nIFSC: ${ifsc}\n\nइसे कॉपी करें और अपने बैंकिंग ऐप में जाकर पेमेंट करें।`);
+    }
+    
+    // QR कोड के लिए सूचना
     else if (document.getElementById('qrDiv').style.display !== 'none') {
-        const file = document.getElementById('qrCodeFile').files[0];
-        if(!file) { alert("कृपया बारकोड फोटो चुनें!"); return; }
-        alert("बारकोड अपलोड हो गया है। अब इसे अपनी गैलरी से खोलकर किसी भी ऐप से स्कैन करें।");
+        alert("QR कोड स्कैन करने के लिए इसे गैलरी में सेव करें और अपने पेमेंट ऐप से फोटो अपलोड करें।");
     }
 }
+
+
+
+
+
+
 </script>
 </body>
 </html>
