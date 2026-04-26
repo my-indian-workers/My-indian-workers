@@ -12,6 +12,7 @@
         input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ccc; border-radius: 8px; font-size: 16px; box-sizing: border-box; }
         .submit-btn { width: 100%; background-color: #27ae60; color: white; border: none; padding: 15px; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; transition: 0.3s; margin-top: 10px; }
         .submit-btn:hover { background-color: #219150; }
+        .submit-btn:disabled { background-color: #95a5a6; cursor: not-allowed; }
         .method-box { padding: 15px; border-radius: 8px; margin-bottom: 10px; text-align: left; border: 1px solid #eee; }
         .bg-green { background: #eafaf1; }
         .bg-gray { background: #f4f7f6; }
@@ -57,7 +58,7 @@
             <label><input type="radio" name="payMethod" onclick="toggleFields('qrDiv')"> 4. बारकोड / QR Code द्वारा</label>
             <div id="qrDiv" style="display:none;">
                 <input type="file" id="qrCodeFile" accept="image/*">
-                <p style="font-size: 12px; color: red;">* बारकोड की फोटो चुनें, सिस्टम स्कैन कर लेगा।</p>
+                <p style="font-size: 12px; color: red;">* बारकोड की फोटो चुनें।</p>
             </div>
         </div>
         
@@ -68,6 +69,9 @@
 <canvas id="canvas"></canvas>
 
 <script>
+// आपका दिया हुआ Script URL
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbznpMOw_XO-TV8zxtzezm6QBUHdkdlWhO8O0_p3QzVAJUopbw0pdv11lsWISLiTvlg/exec";
+
 function toggleFields(divId) {
     const ids = ['upiDiv', 'bankDiv', 'phoneDiv', 'qrDiv'];
     ids.forEach(id => {
@@ -76,41 +80,91 @@ function toggleFields(divId) {
     document.getElementById(divId).style.display = 'block';
 }
 
+// डेटा सेव करने वाला फंक्शन
+
+async function saveToSheet(name, amount, method, tid) {
+    // डेटा को Form Data के रूप में तैयार करें
+    const formData = new URLSearchParams();
+    formData.append('workerName', name);
+    formData.append('payoutAmount', amount);
+    formData.append('method', method);
+    formData.append('tid', tid);
+
+    try {
+        // no-cors के साथ Form Data भेजना सबसे सुरक्षित है
+        await fetch(SCRIPT_URL, {
+            method: 'POST',
+            mode: 'no-cors', 
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: formData.toString()
+        });
+        console.log("Data sent to script");
+        return true; 
+    } catch (e) {
+        console.error("Save Error:", e);
+        return false;
+    }
+}
+
+
+
+
+
 async function processPayment() {
     const name = document.getElementById('workerName').value;
     const amount = document.getElementById('payoutAmount').value;
+    const payBtn = document.getElementById('payBtn');
     
     if(!name || !amount) {
         alert("कृपया नाम और राशि भरें!");
         return;
     }
 
+    // बटन लॉक करें ताकि बार-बार क्लिक न हो
+    payBtn.disabled = true;
+    payBtn.innerHTML = "⏳ डेटा सेव हो रहा है...";
+
+    const tid = "TXN" + Date.now();
+    let method = "";
+
+    // 1. UPI ID
     if (document.getElementById('upiDiv').style.display !== 'none') {
         const upi = document.getElementById('workerUPI').value;
-        if(!upi) { alert("UPI ID भरें!"); return; }
-        launchUPI(upi, name, amount);
+        if(!upi) { alert("UPI ID भरें!"); resetBtn(); return; }
+        method = "UPI ID";
+        await saveToSheet(name, amount, method, tid);
+        launchUPI(upi, name, amount, tid);
     } 
+    // 2. Bank Account
     else if (document.getElementById('bankDiv').style.display !== 'none') {
         const acc = document.getElementById('bankAcc').value;
         const ifsc = document.getElementById('bankIFSC').value;
-        if(!acc || !ifsc) { alert("बैंक डिटेल्स भरें!"); return; }
-        alert(`बैंक ट्रांसफर डिटेल्स:\nनाम: ${name}\nअकाउंट: ${acc}\nIFSC: ${ifsc}\n\nइसे कॉपी करें और अपने बैंकिंग ऐप से मैन्युअल ट्रांसफर करें।`);
+        if(!acc || !ifsc) { alert("बैंक डिटेल्स भरें!"); resetBtn(); return; }
+        method = "Bank Transfer";
+        await saveToSheet(name, amount, method, "BANK"+Date.now());
+        alert(`✅ डेटा सेव हो गया!\nनाम: ${name}\nअकाउंट: ${acc}\nIFSC: ${ifsc}`);
+        resetBtn();
     }
+    // 3. Mobile Number
     else if (document.getElementById('phoneDiv').style.display !== 'none') {
         const phone = document.getElementById('workerPhone').value;
-        if(phone.length < 10) { alert("सही मोबाइल नंबर भरें!"); return; }
-        // मोबाइल नंबर के लिए @paytm, @ybl या @ibl में से @paytm सबसे वर्सेटाइल है
-        launchUPI(`${phone}@paytm`, name, amount);
+        if(phone.length < 10) { alert("सही मोबाइल नंबर भरें!"); resetBtn(); return; }
+        method = "Mobile Number";
+        await saveToSheet(name, amount, method, tid);
+        launchUPI(`${phone}@paytm`, name, amount, tid);
     }
+    // 4. QR Code
     else if (document.getElementById('qrDiv').style.display !== 'none') {
         const fileInput = document.getElementById('qrCodeFile');
-        if (fileInput.files.length === 0) { alert("QR कोड फोटो चुनें!"); return; }
+        if (fileInput.files.length === 0) { alert("QR कोड फोटो चुनें!"); resetBtn(); return; }
 
         const file = fileInput.files[0];
         const reader = new FileReader();
         reader.onload = function(e) {
             const img = new Image();
-            img.onload = function() {
+            img.onload = async function() {
                 const canvas = document.getElementById('canvas');
                 const ctx = canvas.getContext('2d');
                 canvas.width = img.width; canvas.height = img.height;
@@ -119,15 +173,13 @@ async function processPayment() {
                 const code = jsQR(imageData.data, imageData.width, imageData.height);
                 
                 if (code) {
-                    let upiUrl = code.data;
-                    if(!upiUrl.includes('am=')) {
-                        // सुरक्षित रूप से पैरामीटर जोड़ना
-                        const separator = upiUrl.includes('?') ? '&' : '?';
-                        upiUrl += `${separator}am=${amount}&pn=${encodeURIComponent(name)}&cu=INR`;
-                    }
-                    window.location.href = upiUrl;
+                    method = "QR Code";
+                    await saveToSheet(name, amount, method, "QR"+Date.now());
+                    window.location.href = code.data;
+                    resetBtn();
                 } else {
-                    alert("फोटो में बारकोड नहीं मिला! कृपया साफ़ फोटो अपलोड करें।");
+                    alert("बारकोड नहीं मिला!");
+                    resetBtn();
                 }
             };
             img.src = e.target.result;
@@ -136,14 +188,19 @@ async function processPayment() {
     }
 }
 
-function launchUPI(pa, pn, am) {
+function launchUPI(pa, pn, am, tid) {
     let finalPa = pa.trim();
-    const tid = "TXN" + Date.now();
-    // मर्चेंट कोड 5411 और मोड 02 को हटाकर साधारण लिंक बनाया है जो Paytm और अन्य ऐप्स पर ज्यादा चलता है
-    const url = `upi://pay?pa=${finalPa}&pn=${encodeURIComponent(pn)}&am=${am}&cu=INR&tn=Karigar_Payout&tr=${tid}`;
+    if(!finalPa.includes('@')) { finalPa += "@ybl"; }
+    const url = `upi://pay?pa=${finalPa}&pn=${encodeURIComponent(pn)}&am=${am}&cu=INR&tn=Payout&tr=${tid}`;
     window.location.href = url;
+    setTimeout(resetBtn, 4000);
+}
+
+function resetBtn() {
+    const payBtn = document.getElementById('payBtn');
+    payBtn.disabled = false;
+    payBtn.innerHTML = "💸 पेमेंट शुरू करें";
 }
 </script>
-
 </body>
 </html>

@@ -3,258 +3,173 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>वर्कर रजिस्ट्रेशन - My Indian Workers</title>
+    <title>वर्कर पेमेंट - All-in-One Payout</title>
+    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
     <style>
-        body { font-family: sans-serif; background: #f4f4f4; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
-        .form-container { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); width: 300px; }
-        h2 { color: #e67e22; margin-bottom: 20px; text-align: center; }
-        
-        /* इनपुट बॉक्स स्टाइल */
-        input { 
-            width: 100%; 
-            padding: 8px; 
-            margin: 8px 0; 
-            border: 1px solid #ccc; 
-            border-radius: 5px; 
-            box-sizing: border-box; /* इससे पैडिंग बाहर नहीं निकलती */
-        }
-
-        .submit-btn { 
-            width: 100%; 
-            padding: 12px; 
-            background: #e67e22; 
-            color: white; 
-            border: none; 
-            border-radius: 5px; 
-            font-weight: bold; 
-            cursor: pointer; 
-            font-size: 16px;
-        }
-        
-        .submit-btn:hover { background: #d35400; }
-        .back { display: block; text-align: center; margin-top: 15px; color: gray; text-decoration: none; font-size: 14px; }
-
-        /* Modal Styles - पॉप-अप के लिए */
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.7);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-        }
-        .modal-content {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            max-width: 350px;
-            width: 90%;
-            max-height: 85vh;
-            overflow-y: auto;
-        }
-        .modal-header {
-            font-size: 20px;
-            font-weight: bold;
-            color: #d35400;
-            border-bottom: 2px solid #eee;
-            padding-bottom: 10px;
-            margin-bottom: 15px;
-            text-align: center;
-        }
-        .agree-btn {
-            width: 100%;
-            padding: 12px;
-            background: #27ae60;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            font-weight: bold;
-            cursor: pointer;
-            margin-top: 15px;
-        }
+        body { background-color: #f4f7f6; font-family: 'Segoe UI', sans-serif; padding: 10px; display: flex; flex-direction: column; align-items: center; }
+        .form-card { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 100%; max-width: 500px; text-align: center; border-top: 5px solid #27ae60; }
+        h2 { color: #27ae60; margin-bottom: 15px; }
+        input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ccc; border-radius: 8px; font-size: 16px; box-sizing: border-box; }
+        .submit-btn { width: 100%; background-color: #27ae60; color: white; border: none; padding: 15px; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; transition: 0.3s; margin-top: 10px; }
+        .submit-btn:hover { background-color: #219150; }
+        .submit-btn:disabled { background-color: #95a5a6; cursor: not-allowed; }
+        .method-box { padding: 15px; border-radius: 8px; margin-bottom: 10px; text-align: left; border: 1px solid #eee; }
+        .bg-green { background: #eafaf1; }
+        .bg-gray { background: #f4f7f6; }
+        label { font-weight: bold; cursor: pointer; display: block; width: 100%; }
+        #canvas { display: none; }
     </style>
 </head>
 <body>
 
-<div id="workerModal" class="modal-overlay">
-    <div class="modal-content">
-        <div class="modal-header">⚠️ ज़रूरी सूचना - My Indian Workers</div>
-        <div class="modal-body">
-            <p><strong>रुकिए!</strong> यदि आप कंपनी के साथ लाइफटाइम तक काम करना चाहते हैं, तो ध्यान दें:</p>
-            <ul>
-                <li><strong>ईमानदारी:</strong> आप मालिक से मिलकर कंपनी को धोखा नहीं देंगे। काम का पैसा आप स्वयं नकद (Cash) नहीं लेंगे। मालिक से कहें कि पेमेंट सीधे कंपनी के खाते में जमा करें।</li>
-                <li><strong>REPORTING:</strong> काम खत्म होने के बाद आपको 'Work Completed' फॉर्म सबमिट करना होगा।</li>
-                <li><strong>काम की गारंटी:</strong> आप कंपनी को जितना फायदा पहुँचाएंगे, आपको उतना ही ज्यादा काम मिलेगा।</li>
-                <li><strong>सावधान:</strong> यदि आप सीधी डीलिंग करते हैं, तो कंपनी आपको हमेशा के लिए <b>ब्लॉक</b> कर देगी।</li>
-            </ul>
-            <p style="text-align:center;"><b>अब आप खुद सोचिए, आपको पूरी लाइफ काम करना है या सिर्फ एक दिन के लिए?</b></p>
+<div class="form-card">
+    <h2>वर्कर पेमेंट (Payout)</h2>
+    
+    <form id="payoutForm">
+        <input type="text" id="workerName" name="name" placeholder="वर्कर का नाम" required>
+        <input type="number" id="payoutAmount" name="amount" placeholder="पेमेंट राशि (Amount) ₹" required>
+
+        <hr style="margin: 20px 0; border-top: 1px dashed #ccc;">
+        <p style="font-weight: bold; color: #2c3e50; text-align: left;">पेमेंट का तरीका चुनें:</p>
+
+        <div class="method-box bg-green">
+            <label><input type="radio" name="payMethod" value="UPI ID" onclick="toggleFields('upiDiv')" checked> 1. UPI ID द्वारा</label>
+            <div id="upiDiv">
+                <input type="text" id="workerUPI" placeholder="UPI ID (जैसे: abc@ybl)">
+            </div>
         </div>
-        <div class="modal-footer">
-            <button class="agree-btn" id="confirmSubmit">मैं सहमत हूँ और ईमानदारी से काम करूँगा</button>
+
+        <div class="method-box bg-gray">
+            <label><input type="radio" name="payMethod" value="Bank Transfer" onclick="toggleFields('bankDiv')"> 2. बैंक अकाउंट द्वारा</label>
+            <div id="bankDiv" style="display:none;">
+                <input type="text" id="bankAcc" placeholder="अकाउंट नंबर">
+                <input type="text" id="bankIFSC" placeholder="IFSC कोड">
+            </div>
         </div>
-    </div>
-</div>
 
-<div class="form-container">
-    <h2>वर्कर पंजीकरण</h2>
-    
-   <form id="workerForm">
-    <input type="text" id="regName" name="regName" placeholder="पूरा नाम" required>
-    <div style="display: flex; gap: 5px; margin-bottom: 10px;">
-    <select name="countryCode" style="width: 85px; padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 14px;">
-        <option value="+91">+91 (IN)</option>
-        <option value="+966">+966 (SA)</option>
-        <option value="+971">+971 (UAE)</option>
-    </select>
+        <div class="method-box bg-green">
+            <label><input type="radio" name="payMethod" value="Mobile/Paytm" onclick="toggleFields('phoneDiv')"> 3. मोबाइल नंबर (Paytm/GPay/PhonePe)</label>
+            <div id="phoneDiv" style="display:none;">
+                <input type="tel" id="workerPhone" placeholder="10 अंकों का मोबाइल नंबर" maxlength="10">
+            </div>
+        </div>
 
-    <input type="tel" 
-           name="regMobile" 
-           id="regMobile"
-           placeholder="मोबाइल नंबर (10 अंक)" 
-           pattern="[0-9]{10}" 
-           title="कृपया 10 अंकों का सही मोबाइल नंबर डालें" 
-           maxlength="10" 
-           oninput="this.value = this.value.replace(/[^0-9]/g, '');"
-           style="flex: 1; padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 16px; box-sizing: border-box;"
-           required>
-</div>
-<div style="width: 100%; margin-bottom: 10px;">
-    <input type="tel" 
-           name="regAadhar" 
-           id="regAadhar"
-           placeholder="आधार कार्ड नंबर (12 अंक)" 
-           pattern="[0-9]{12}" 
-           title="आधार कार्ड 12 अंकों का होना चाहिए" 
-           maxlength="12" 
-           oninput="this.value = this.value.replace(/[^0-9]/g, '');"
-           style="width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 16px; box-sizing: border-box; display: block;"
-           required>
-</div>
-
-<input type="text" name="regAddress"
-id="regAddress"
-placeholder="पूरा पता (गाँव,कसबा,मकान नंबर/गली)" required>
-    
-<input type="text" name="regCity"
-id="regCity"
-placeholder="अपना शहर लिखें (जैसे: ब्लॉक का नाम,और शहर, जिला)" required>
-
-<div class="form-group">
-    <label for="workInput" style="display: block; margin-bottom: 8px; font-weight: bold;">
-        अपना काम चुनें (Select Your Work):
-    </label>
-    
-    <select id="workInput" name="regWork" required 
-        style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #ccc; font-size: 16px;">
-        <option value="">-- यहाँ क्लिक करके चुनें --</option>
-        <option value="Plumber">प्लंबर (Plumber)</option>
-        <option value="Electrician">इलेक्ट्रीशियन (Electrician)</option>
-        <option value="Carpenter">बढ़ई (Carpenter)</option>
-        <option value="Mason">राजमिस्त्री (Mason)</option>
-        <option value="Painter">पेंटर (Painter)</option>
-        <option value="Welder">वेल्डर (Welder)</option>
-        <option value="AC Mechanic">एसी मैकेनिक (AC Mechanic)</option>
-        <option value="Tiles Mistri">टाइल्स मिस्त्री (Tiles Mistri)</option>
-        <option value="Labour">मजदूर (Labour)</option>
+        <div class="method-box bg-gray">
+            <label><input type="radio" name="payMethod" value="QR Code" onclick="toggleFields('qrDiv')"> 4. बारकोड / QR Code द्वारा</label>
+            <div id="qrDiv" style="display:none;">
+                <input type="file" id="qrCodeFile" accept="image/*">
+                <p style="font-size: 12px; color: red;">* बारकोड की फोटो चुनें।</p>
+            </div>
+        </div>
         
-        <option value="cctv_smart_home">स्मार्ट होम और CCTV</option>
-<option value="computer_repair">कंप्यूटर और लैपटॉप रिपेयर</option>
-<option value="mobile_repair">मोबाइल और टैबलेट रिपेयर</option>
-<option value="electrical_gadgets">इलेक्ट्रिकल और गैजेट्स</option>
-<option value="solar_panel">सोलर पैनल सर्विस</option>
-
-        <option value="Other">अन्य (Other)</option>
-    </select>
+        <button type="button" onclick="processPayment()" id="payBtn" class="submit-btn">💸 पेमेंट शुरू करें</button>
+    </form>
 </div>
 
-
-
-<div class="form-group" style="margin-top: 15px;">
-    <label for="paymentDetails" style="display: block; margin-bottom: 8px; font-weight: bold;">
-        पेमेंट की जानकारी (UPI ID / खाता नंबर / मोबाइल नंबर):
-    </label>
-    <input type="text" name="regPayment" id="regPayment" placeholder="यहाँ अपनी UPI ID, बैंक खाता या मोबाइल नंबर लिखें" required ...>
-
-         
-</div>
-
-
-
-
-
-
-     <input type="hidden" name="userType" value="worker">
-
-    <button type="submit" class="submit-btn">सबमिट करें</button>
-    
-    ​"काम की तलाश छोड़िए, अब काम खुद आपके पास आएगा! 🛠️"
-​'My Indian Workers' से जुड़ें और अपनी कला की सही कीमत पाएं।
-न भाग-दौड़ की चिंता, न पैसों का झंझट—बस काम पर ध्यान दें, बाकी हम संभालेंगे।
-    
-</form>
-<div style="text-align:center; margin-top:20px;">
-        <h3>वर्कर अपनी हाजिरी दर्ज करें 👇</h3>
-    <button onclick="window.location.href='attendance.html'" 
-            style="background:#2c3e50; color:white; padding:15px 30px; border:none; border-radius:10px; font-weight:bold; cursor:pointer; width:90%; font-size:18px;">
-        📸 वर्कर हाजिरी (Attendance)
-    </button>
-</div>
-
-
-
-<div style="text-align: center; margin-top: 25px;">
-    <button onclick="window.location.href='receiving.html'" 
-        style="background-color: #28a745; color: white; border: none; padding: 15px 30px; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; width: 90%; max-width: 320px;">
-        ✅ काम खत्म (Done) - फॉर्म भरें
-    </button>
-</div>
-
-
-
-
-   <a href="login-choice.html" class="back">← वापस जाएँ</a>
-</div>
+<canvas id="canvas"></canvas>
 
 <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbynQZDzj81nXNUeu4rmiNayiwe_lqooOquFHc2L90ngrTkNKKmPUcKGiLrvZQY4UrE/exec"; 
-    const form = document.getElementById('workerForm');
-    const modal = document.getElementById('workerModal');
-    const confirmBtn = document.getElementById('confirmSubmit');
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxe9c-ACKVZVnfmcysOfHNXVO0JrpUOmtsCfwM53lE9dKShBVOiDM6uJ33pjCOecA/exec";
 
-    // फॉर्म सबमिट होने पर पहले पॉप-अप दिखाएं
-    form.addEventListener('submit', function(e) {
-        e.preventDefault();
-        modal.style.display = 'flex'; // पॉप-अप खोलें
+function toggleFields(divId) {
+    ['upiDiv', 'bankDiv', 'phoneDiv', 'qrDiv'].forEach(id => {
+        document.getElementById(id).style.display = 'none';
     });
+    document.getElementById(divId).style.display = 'block';
+}
 
-    // जब यूजर पॉप-अप में "सहमत हूँ" बटन दबाए
-    confirmBtn.addEventListener('click', function() {
-        modal.style.display = 'none'; // पॉप-अप बंद करें
-        
-        const btn = form.querySelector('.submit-btn');
-        btn.innerText = "⏳ प्रोसेसिंग...";
-        btn.disabled = true;
+async function saveToSheet(name, amount, method, tid) {
+    const data = {
+        name: name,
+        amount: amount,
+        method: method,
+        tid: tid
+    };
 
-        const formData = new FormData(form);
-        const data = {};
-        formData.forEach((value, key) => { data[key] = value; });
-
-        fetch(SCRIPT_URL, {
+    // आपके वर्कर रजिस्ट्रेशन वाले स्टाइल में डेटा भेजना
+    try {
+        await fetch(SCRIPT_URL, {
             method: 'POST',
             mode: 'no-cors',
             body: JSON.stringify(data)
-        }).then(() => {
-            alert("सफलतापूर्वक आपका रजिस्ट्रेशन हो गया!");
-            location.reload();
-        }).catch(() => {
-            alert("कुछ गड़बड़ हुई, दोबारा प्रयास करें।");
-            btn.disabled = false;
         });
-    });
-</script>
+        return true;
+    } catch (e) {
+        return false;
+    }
+}
 
+async function processPayment() {
+    const name = document.getElementById('workerName').value;
+    const amount = document.getElementById('payoutAmount').value;
+    const payBtn = document.getElementById('payBtn');
+    
+    if(!name || !amount) { alert("नाम और राशि भरें!"); return; }
+
+    payBtn.disabled = true;
+    payBtn.innerHTML = "⏳ डेटा सुरक्षित सेव हो रहा है...";
+
+    const tid = "TXN" + Date.now();
+
+    if (document.getElementById('upiDiv').style.display !== 'none') {
+        const upi = document.getElementById('workerUPI').value;
+        if(!upi) { alert("UPI ID भरें!"); resetBtn(); return; }
+        await saveToSheet(name, amount, "UPI ID", tid);
+        launchUPI(upi, name, amount, tid);
+    } 
+    else if (document.getElementById('bankDiv').style.display !== 'none') {
+        const acc = document.getElementById('bankAcc').value;
+        const ifsc = document.getElementById('bankIFSC').value;
+        if(!acc || !ifsc) { alert("बैंक डिटेल्स भरें!"); resetBtn(); return; }
+        await saveToSheet(name, amount, "Bank Transfer", "BANK" + Date.now());
+        alert("✅ डेटा सेव हो गया! बैंक डिटेल्स कॉपी करें।");
+        resetBtn();
+    }
+    else if (document.getElementById('phoneDiv').style.display !== 'none') {
+        const phone = document.getElementById('workerPhone').value;
+        if(phone.length < 10) { alert("मोबाइल नंबर भरें!"); resetBtn(); return; }
+        await saveToSheet(name, amount, "Mobile/Paytm", tid);
+        launchUPI(`${phone}@paytm`, name, amount, tid);
+    }
+    else if (document.getElementById('qrDiv').style.display !== 'none') {
+        const fileInput = document.getElementById('qrCodeFile');
+        if (fileInput.files.length === 0) { alert("QR फोटो चुनें!"); resetBtn(); return; }
+
+        const file = fileInput.files[0];
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const img = new Image();
+            img.onload = async function() {
+                const canvas = document.getElementById('canvas');
+                const ctx = canvas.getContext('2d');
+                canvas.width = img.width; canvas.height = img.height;
+                ctx.drawImage(img, 0, 0);
+                const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                const code = jsQR(imageData.data, imageData.width, imageData.height);
+                if (code) {
+                    await saveToSheet(name, amount, "QR Code", "QR" + Date.now());
+                    window.location.href = code.data;
+                    resetBtn();
+                } else { alert("बारकोड नहीं मिला!"); resetBtn(); }
+            };
+            img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    }
+}
+
+function resetBtn() {
+    const payBtn = document.getElementById('payBtn');
+    payBtn.disabled = false;
+    payBtn.innerHTML = "💸 पेमेंट शुरू करें";
+}
+
+function launchUPI(pa, pn, am, tid) {
+    let finalPa = pa.trim();
+    if(!finalPa.includes('@')) { finalPa = finalPa + "@ybl"; }
+    window.location.href = `upi://pay?pa=${finalPa}&pn=${encodeURIComponent(pn)}&am=${am}&cu=INR&tn=Payout&tr=${tid}`;
+    setTimeout(resetBtn, 4000);
+}
+</script>
 </body>
 </html>
-
- : <input type="hidden" name="userType" value="worker">
