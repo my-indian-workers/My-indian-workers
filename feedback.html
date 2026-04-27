@@ -8,17 +8,16 @@
         body { font-family: 'Segoe UI', sans-serif; background: #f4f4f4; padding: 15px; display: flex; justify-content: center; }
         .feedback-card { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); width: 100%; max-width: 400px; text-align: center; }
         h2 { color: #f39c12; margin-bottom: 10px; }
-        
-        /* स्टार रेटिंग स्टाइल */
         .stars { margin: 20px 0; display: flex; justify-content: center; flex-direction: row-reverse; }
         .stars input { display: none; }
         .stars label { font-size: 40px; color: #ddd; cursor: pointer; transition: 0.2s; }
         .stars input:checked ~ label { color: #f39c12; }
         .stars label:hover, .stars label:hover ~ label { color: #f1c40f; }
-
         textarea { width: 100%; height: 100px; padding: 10px; border: 1px solid #ddd; border-radius: 8px; resize: none; box-sizing: border-box; font-size: 14px; }
+        input[type="text"] { width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
         .btn-submit { background: #f39c12; color: white; border: none; padding: 15px; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 15px; font-size: 16px; }
         .success-msg { display: none; color: #27ae60; font-weight: bold; margin-top: 20px; }
+        label { display: block; text-align: left; font-size: 14px; margin-bottom: 5px; color: #333; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -36,8 +35,13 @@
             <input type="radio" name="rating" value="1" id="star1"><label for="star1">★</label>
         </div>
 
-        <input type="text" id="fbName" placeholder="आपका नाम" required style="width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box;">
+        <label>आपका नाम:</label>
+        <input type="text" id="fbName" placeholder="अपना नाम लिखें" required>
         
+        <label>कारीगर का नाम:</label>
+        <input type="text" id="workerName" placeholder="कारीगर का नाम लिखें" required>
+        
+        <label>सुझाव:</label>
         <textarea id="fbComment" placeholder="अपना सुझाव या अनुभव यहाँ लिखें..."></textarea>
 
         <button type="submit" id="submitBtn" class="btn-submit">सबमिट करें</button>
@@ -51,7 +55,8 @@
 </div>
 
 <script>
-    const SCRIPT_URL = "आपका_GOOGLE_SCRIPT_URL_यहाँ_डालें";
+    // आपका सही URL यहाँ है
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwVU769fXEPMgZksSNyEr32mQOI90OcsGNmTFOAPWKT_IwHg03MZTm3Z23gFvp1b6Y/exec";
 
     document.getElementById('feedbackForm').addEventListener('submit', function(e) {
         e.preventDefault();
@@ -59,6 +64,7 @@
         const btn = document.getElementById('submitBtn');
         const rating = document.querySelector('input[name="rating"]:checked');
         const name = document.getElementById('fbName').value;
+        const worker = document.getElementById('workerName').value;
         const comment = document.getElementById('fbComment').value;
 
         if (!rating) {
@@ -69,14 +75,15 @@
         btn.innerText = "⏳ सबमिट हो रहा है...";
         btn.disabled = true;
 
+        // डेटा ऑब्जेक्ट जिसमें वर्कर का नाम भी शामिल है
         const data = {
-            userType: "feedback",
-            rating: rating.value,
             name: name,
-            comment: comment
+            rating: rating.value,
+            comment: comment,
+            workerName: worker
         };
 
-        // डेटा भेजना (Google Sheet पर)
+        // Google Sheet पर डेटा भेजना
         fetch(SCRIPT_URL, {
             method: 'POST',
             mode: 'no-cors',
@@ -85,6 +92,7 @@
             document.getElementById('feedbackForm').style.display = 'none';
             document.getElementById('thankYou').style.display = 'block';
         }).catch(err => {
+            console.error(err);
             alert("कुछ गड़बड़ हुई, दोबारा कोशिश करें।");
             btn.innerText = "सबमिट करें";
             btn.disabled = false;
